@@ -14,6 +14,8 @@
 
 第二章《山門不渡凡人》正文第一版已完成並落檔：`data/content/chapter2_full_text.md`，另保留 `data/content/chapter2_parts/` 九個可維護分段。主檔目前為 55,940 個 Unicode 字元、210 個 `ch2.*` 正文區段，內容不是骨架，已實作靈根測試、雜役契約、靈石搬運、藥田、師兄利用、外門規矩、殘缺功法、外門補錄、宗門耗材、凡人/記名/外門等收束與第三章坊市伏筆。
 
+第二章互動第一版已接入 `fanren.html`，互動資料獨立放在 `data/runtime/chapter2_scenes.js`。第一章「灰衣」結算新增正式第二章入口；第二章目前有 66 個可到達場景、14 個死亡場景、6 個存活收束、19 個含隱藏結果池的隨機事件場景。Runtime 新增 choice-level `nextPool` 與 scene-level `randomNexts`，讓同一表面行動可落入不同背後真相，避免死亡後背固定答案。主線已涵蓋契約、分工、搬靈石、帳房、藥田、夜間臨時差、鄭師兄利用、外門規矩、殘缺功法、引氣、外門補錄與第一次成為「師兄」後向下轉嫁壓力。
+
 ## 本機資料夾
 
 `Games/FanRenBuXiuXian`
@@ -34,7 +36,7 @@
 2. 將 `chapter1_full_text.md` 更細拆分映射到 runtime 可抽取的 scene / choice / death / epitaph blocks。
 3. 進行第一章 20～30 次輪迴測試，檢查是否符合死亡曲線與「死後想再投一世」。
 4. 依實測補足更多事件變體與特殊死法。
-5. 將第二章 55,940 字正文映射為 runtime 可抽取的 scene / choice / death / epitaph blocks，並在第一章結束後接入第二章互動頁。
+5. 以手機實測第二章互動節奏與死亡/存活分支，再把正文主檔剩餘尚未映射的 `ch2.*` 變體逐步補進 `data/runtime/chapter2_scenes.js`。
 
 ## 禁止膨脹項目
 

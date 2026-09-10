@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0805" />
-  <title>凡人不修仙｜第一章</title>
+  <title>凡人不修仙</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700&family=Ma+Shan+Zheng&display=swap');
 
@@ -609,7 +609,7 @@
 <body>
   <main class="game-root" id="gameRoot">
     <header class="game-header" aria-label="遊戲狀態">
-      <div class="game-title-bar">凡人不修仙：第一章</div>
+      <div class="game-title-bar" id="gameTitleBar">凡人不修仙：第一章</div>
       <div class="game-status" id="statusBar"></div>
       <div class="font-controls" aria-label="字體大小">
         <span>字體</span>
@@ -621,6 +621,7 @@
     <section class="game-content" id="gameContent" aria-live="polite"></section>
   </main>
 
+  <script src="data/runtime/chapter2_scenes.js"></script>
   <script>
     (() => {
       const INITIAL = Object.freeze({ coins: 3, qi: 80, deaths: 0, age: 17, closestMoment: '尚未摸到仙途' });
@@ -1055,18 +1056,20 @@
           ]
         },
         servant_survival: {
-          chapter: '青雲宗雜役',
+          chapter: '第一章・章末',
           title: '灰衣',
           type: 'survival',
-          ageAtEnd: 18,
-          closestMoment: '成為青雲宗雜役，不是弟子',
+          ageAtEnd: 17,
+          closestMoment: '通過青雲宗雜役第一天試工',
           intel: '你踏進了仙門，但門檻後面不是仙途，是耗材倉庫。',
+          continueTo: 'ch2_contract_entry',
+          continueLabel: '進入第二章：山門不渡凡人',
           paragraphs: [
-            '你活過了第一天。',
+            '你活過了第一天試工。',
             '這在雜役房裡已經值得慶祝。',
-            '你得到一套灰衣、一塊木牌，還有一張不准擅自下山的規矩紙。',
+            '趙管事給了你一套暫用灰衣，收走候選木牌，說明早來簽正式短契。',
             '你離仙人很近。近到他們吩咐事情時，不用提高聲音。',
-            '第一章到此為止。第二章裡，你會知道進門不是勝利，只是換一種死法。'
+            '第一章到此為止。你沒有進外門，只是成功讓宗門決定：這個凡人暫時還值得留下。'
           ]
         },
         reject_alive: {
@@ -1573,9 +1576,12 @@
         }
       };
 
+      Object.assign(SCENES, window.CHAPTER2_SCENES || {});
+
       const root = document.getElementById('gameRoot');
       const content = document.getElementById('gameContent');
       const statusBar = document.getElementById('statusBar');
+      const gameTitleBar = document.getElementById('gameTitleBar');
       const fontButtons = Array.from(document.querySelectorAll('[data-font-size]'));
       let state = { ...INITIAL };
       let sceneKey = 'intro';
@@ -1623,6 +1629,9 @@
 
       function updateStatus(scene) {
         const label = scene && scene.type === 'death' ? '已死' : scene && scene.type === 'survival' ? '存活' : '輪迴中';
+        const bookChapter = scene && Number(scene.bookChapter) === 2 ? 2 : 1;
+        if (gameTitleBar) gameTitleBar.textContent = `凡人不修仙：第${bookChapter === 2 ? '二' : '一'}章`;
+        document.title = `凡人不修仙｜第${bookChapter === 2 ? '二' : '一'}章`;
         statusBar.innerHTML = `
           <span class="stat">銅錢 <strong>${state.coins}</strong></span>
           <span class="stat">氣血 <strong>${state.qi}</strong></span>
@@ -1640,13 +1649,35 @@
         renderScene();
       }
 
+      function pickWeighted(items) {
+        if (!Array.isArray(items) || !items.length) return null;
+        const normalized = items.map(item => ({ ...item, weight: Math.max(0, Number(item.weight) || 1) }));
+        const total = normalized.reduce((sum, item) => sum + item.weight, 0);
+        if (total <= 0) return normalized[0] && normalized[0].next;
+        let roll = Math.random() * total;
+        for (const item of normalized) {
+          roll -= item.weight;
+          if (roll <= 0) return item.next;
+        }
+        return normalized[normalized.length - 1].next;
+      }
+
+      function resolveChoiceNext(choice) {
+        if (!choice) return null;
+        if (Array.isArray(choice.nextPool) && choice.nextPool.length) return pickWeighted(choice.nextPool);
+        return choice.next || null;
+      }
+
       function choose(choice) {
         clearTimers();
         applyChoice(choice);
-        go(choice.next);
+        const destination = resolveChoiceNext(choice);
+        if (!destination) return renderMissing('choice-destination');
+        go(destination);
       }
 
       function getRandomAuto(scene) {
+        if (Array.isArray(scene.randomNexts) && scene.randomNexts.length) return pickWeighted(scene.randomNexts);
         if (!scene.autoNext) return null;
         if (typeof scene.autoNextProb === 'number' && scene.autoFailNext) {
           return Math.random() < scene.autoNextProb ? scene.autoNext : scene.autoFailNext;
@@ -1728,6 +1759,7 @@
         const hint = content.querySelector('#readingHint');
         const skipBtn = content.querySelector('#skipTextBtn');
         const controller = { cancelled: false, skipAll: false, finishCurrent: null };
+        const hasAutoOutcome = Boolean(scene.autoNext || (Array.isArray(scene.randomNexts) && scene.randomNexts.length));
         activeReveal = controller;
         if (skipBtn) {
           skipBtn.addEventListener('click', () => {
@@ -1750,8 +1782,8 @@
         if (controller.cancelled || token !== runToken) return;
         const tools = content.querySelector('.text-tools');
         if (tools) tools.hidden = true;
-        if (hint) hint.textContent = scene.autoNext ? '正文已讀完，命運正在翻牌。' : '正文已讀完，請往下抉擇。';
-        if (scene.autoNext) {
+        if (hint) hint.textContent = hasAutoOutcome ? '正文已讀完，命運正在翻牌。' : '正文已讀完，請往下抉擇。';
+        if (hasAutoOutcome) {
           choiceMount.innerHTML = '<div class="auto-wait" aria-label="命運正在翻牌"><span>命</span></div>';
         } else {
           choiceMount.innerHTML = renderChoices(choices);
@@ -1841,12 +1873,15 @@
             ${renderIntel(scene.intel)}
             <div class="closest-moment"><div class="closest-moment-label">此生最接近仙途</div><div class="closest-moment-text">${escapeHtml(scene.closestMoment || state.closestMoment)}</div></div>
             <div class="footer-actions">
+              ${scene.continueTo ? `<button class="restart-btn" type="button" id="continueBtn">${escapeHtml(scene.continueLabel || '繼續')}</button>` : ''}
               <button class="restart-btn" type="button" id="restartBtn">再投一世</button>
               <button class="home-btn" type="button" id="chapterBtn">回到三岔口</button>
             </div>
           </div>
         `;
         content.scrollTop = 0;
+        const continueBtn = content.querySelector('#continueBtn');
+        if (continueBtn && scene.continueTo) continueBtn.addEventListener('click', () => go(scene.continueTo));
         content.querySelector('#restartBtn').addEventListener('click', restart);
         content.querySelector('#chapterBtn').addEventListener('click', () => go('start_choice'));
       }
