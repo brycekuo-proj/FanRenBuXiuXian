@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#100d0a" />
+  <title>凡人不修仙</title>
+  <style>
+    :root {
+      --bg: #100d0a;
+      --paper: #211a13;
+      --paper-2: #17120e;
+      --ink: #eadcc5;
+      --muted: #9d8d78;
+      --line: #594733;
+      --gold: #c49a5a;
+      --danger: #8f3e32;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at 50% 15%, rgba(145, 102, 55, .12), transparent 36%),
+        linear-gradient(180deg, #15100c 0%, var(--bg) 60%, #090806 100%);
+      color: var(--ink);
+      font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: max(24px, env(safe-area-inset-top)) 18px max(24px, env(safe-area-inset-bottom));
+    }
+
+    .page {
+      width: min(100%, 520px);
+    }
+
+    .seal {
+      width: 46px;
+      height: 46px;
+      margin: 0 auto 18px;
+      border: 1px solid rgba(143, 62, 50, .9);
+      color: #d08d80;
+      display: grid;
+      place-items: center;
+      transform: rotate(-3deg);
+      letter-spacing: .15em;
+      font-size: 13px;
+      opacity: .9;
+    }
+
+    h1 {
+      margin: 0;
+      text-align: center;
+      font-size: clamp(38px, 10vw, 58px);
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-indent: .12em;
+      text-shadow: 0 4px 24px rgba(0, 0, 0, .55);
+    }
+
+    .subtitle {
+      margin: 12px auto 30px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      letter-spacing: .22em;
+    }
+
+    .motto {
+      position: relative;
+      margin: 0 0 28px;
+      padding: 18px 20px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      color: #bfb09b;
+      text-align: center;
+      line-height: 1.9;
+      font-size: 14px;
+    }
+
+    .motto strong {
+      color: #d4b27e;
+      font-weight: 500;
+    }
+
+    .chapters {
+      display: grid;
+      gap: 11px;
+    }
+
+    .chapter {
+      appearance: none;
+      width: 100%;
+      min-height: 78px;
+      display: grid;
+      grid-template-columns: 58px 1fr auto;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--line);
+      background: linear-gradient(135deg, rgba(40, 31, 23, .95), rgba(23, 18, 14, .96));
+      color: var(--ink);
+      text-align: left;
+      font: inherit;
+      cursor: pointer;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
+    }
+
+    .chapter:hover,
+    .chapter:focus-visible {
+      transform: translateY(-1px);
+      border-color: #846a48;
+      outline: none;
+      background: linear-gradient(135deg, rgba(50, 39, 28, .98), rgba(25, 19, 14, .98));
+    }
+
+    .chapter.disabled {
+      cursor: default;
+      opacity: .58;
+    }
+
+    .chapter.disabled:hover { transform: none; }
+
+    .num {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #6a5238;
+      color: var(--gold);
+      font-size: 20px;
+    }
+
+    .copy b {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      letter-spacing: .12em;
+      font-size: 17px;
+    }
+
+    .copy span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .state {
+      color: #b98f53;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .disabled .state { color: #756958; }
+
+    footer {
+      margin-top: 26px;
+      text-align: center;
+      color: #62584b;
+      font-size: 11px;
+      letter-spacing: .12em;
+      line-height: 1.8;
+    }
+
+    @media (max-width: 380px) {
+      .chapter { grid-template-columns: 48px 1fr; }
+      .state { grid-column: 2; }
+      .num { width: 42px; height: 42px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="seal" aria-hidden="true">凡人</div>
+    <h1>凡人不修仙</h1>
+    <div class="subtitle">你以為活著就算贏了？</div>
+
+    <div class="motto">
+      <strong>自己死 ＞ 看別人死 ＞ 讓別人死</strong><br />
+      每一次活下來，都可能只是讓你離「那個人」更近一步。
+    </div>
+
+    <section class="chapters" aria-label="章節選擇">
+      <button class="chapter" type="button" data-chapter="1">
+        <span class="num">壹</span>
+        <span class="copy"><b>第一章</b><span>凡人入局，先學會怎麼死。</span></span>
+        <span class="state">可進入</span>
+      </button>
+
+      <button class="chapter disabled" type="button" disabled>
+        <span class="num">貳</span>
+        <span class="copy"><b>第二章</b><span>活著的人，開始看見別人怎麼死。</span></span>
+        <span class="state">開發中</span>
+      </button>
+
+      <button class="chapter disabled" type="button" disabled>
+        <span class="num">參</span>
+        <span class="copy"><b>第三章</b><span>當求生開始需要別人付代價。</span></span>
+        <span class="state">開發中</span>
+      </button>
+
+      <button class="chapter disabled" type="button" disabled>
+        <span class="num">肆</span>
+        <span class="copy"><b>第四章</b><span>打了小的來了老的——只是今天的小的，是你。</span></span>
+        <span class="state">開發中</span>
+      </button>
+
+      <button class="chapter disabled" type="button" disabled>
+        <span class="num">伍</span>
+        <span class="copy"><b>第五章</b><span>弒龍者終成惡龍。</span></span>
+        <span class="state">開發中</span>
+      </button>
+    </section>
+
+    <footer>
+      死亡不是答案提示。<br />
+      你只能比上一世，更懂這個世界一點。
+    </footer>
+  </main>
+
+  <script>
+    document.querySelector('[data-chapter="1"]').addEventListener('click', () => {
+      alert('第一章正文已完成；遊戲互動頁面下一步接入。');
+    });
+  </script>
+</body>
+</html>
