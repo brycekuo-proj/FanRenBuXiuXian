@@ -8,6 +8,8 @@
 
 第一章正文已完成第一版 5～6 萬字主檔：`data/content/chapter1_full_text.md`。目前統計為含空白 52,465 字、不含空白 50,005 字、共 2,329 行。此檔不是骨架，而是可直接拆入遊戲事件池、選項結果、死亡畫面、墓誌銘與死後情報的正文內容。
 
+第一章互動頁已在 `fanren.html` 完成第一版接入：首頁第一章按鈕不再跳 alert，改為進入可遊玩的短局文字 Roguelike 流程，包含投胎、狀態、可見徵兆、選項、背後真相、死亡/結局、墓誌銘、死後情報與再投一世。
+
 ## 本機資料夾
 
 `Games/FanRenBuXiuXian`
@@ -24,11 +26,11 @@
 
 ## 下一步
 
-1. 將現有 Replit Web MVP 的程式碼與第一章 JSON 事件資料對齊。
-2. 建立 runtime loader：讀取 life profile、event lines、hidden truth、choices、death result、intel、epitaph。
-3. 實作墓誌銘顯示與情報收集邏輯。
-4. 將 `chapter1_full_text.md` 拆分映射到 runtime 可抽取的 scene / choice / death / epitaph blocks。
-5. 進行第一章 20～30 次輪迴測試，檢查是否符合死亡曲線與「死後想再投一世」。
+1. 將 `fanren.html` 第一章互動頁 push 到 GitHub Pages 並用手機實機驗證。
+2. 將 `chapter1_full_text.md` 更細拆分映射到 runtime 可抽取的 scene / choice / death / epitaph blocks。
+3. 進行第一章 20～30 次輪迴測試，檢查是否符合死亡曲線與「死後想再投一世」。
+4. 依實測補足更多事件變體與特殊死法。
+5. 第二章暫不開發，只保留入口提示。
 
 ## 禁止膨脹項目
 

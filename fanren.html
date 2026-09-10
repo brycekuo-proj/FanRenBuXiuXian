@@ -4,138 +4,996 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#100d0a" />
-  <title>凡人不修仙</title>
+  <title>凡人不修仙｜第一章互動頁</title>
   <style>
     :root {
       --bg: #100d0a;
       --paper: #211a13;
       --paper-2: #17120e;
+      --paper-3: #2b2117;
       --ink: #eadcc5;
-      --muted: #9d8d78;
+      --muted: #a7957d;
+      --dim: #726555;
       --line: #594733;
+      --line-soft: rgba(180, 143, 91, .26);
       --gold: #c49a5a;
-      --danger: #8f3e32;
+      --gold-2: #e4bd78;
+      --danger: #a44d3e;
+      --danger-soft: rgba(164, 77, 62, .16);
+      --ok: #8aa36c;
+      --shadow: rgba(0, 0, 0, .45);
     }
     * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      min-height: 100%;
+    html, body { margin: 0; min-height: 100%; }
+    body {
       background:
-        radial-gradient(circle at 50% 15%, rgba(145, 102, 55, .12), transparent 36%),
-        linear-gradient(180deg, #15100c 0%, var(--bg) 60%, #090806 100%);
+        radial-gradient(circle at 50% 8%, rgba(145, 102, 55, .16), transparent 34%),
+        radial-gradient(circle at 15% 92%, rgba(107, 61, 41, .16), transparent 34%),
+        linear-gradient(180deg, #15100c 0%, var(--bg) 62%, #090806 100%);
       color: var(--ink);
       font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+      line-height: 1.72;
     }
-    body {
-      min-height: 100vh;
+    button, a { font: inherit; }
+    a { color: inherit; }
+    .app {
+      width: min(100%, 760px);
+      margin: 0 auto;
+      padding: max(18px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom));
+    }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .topbar {
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .ghost-link, .small-btn {
+      min-height: 42px;
+      padding: 8px 12px;
+      border: 1px solid var(--line-soft);
+      background: rgba(22, 17, 13, .72);
+      color: var(--muted);
+      text-decoration: none;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
       justify-content: center;
-      padding: max(24px, env(safe-area-inset-top)) 18px max(24px, env(safe-area-inset-bottom));
+      gap: 6px;
+      cursor: pointer;
     }
-    .page { width: min(100%, 520px); }
+    .ghost-link:focus-visible, .small-btn:focus-visible, .chapter:focus-visible, .choice:focus-visible, .primary:focus-visible, .secondary:focus-visible {
+      outline: 2px solid rgba(228, 189, 120, .75);
+      outline-offset: 2px;
+    }
     .seal {
-      width: 46px; height: 46px; margin: 0 auto 18px;
-      border: 1px solid rgba(143, 62, 50, .9); color: #d08d80;
-      display: grid; place-items: center; transform: rotate(-3deg);
-      letter-spacing: .15em; font-size: 13px; opacity: .9;
+      width: 48px;
+      height: 48px;
+      margin: 8px auto 18px;
+      border: 1px solid rgba(143, 62, 50, .9);
+      color: #d08d80;
+      display: grid;
+      place-items: center;
+      transform: rotate(-3deg);
+      letter-spacing: .15em;
+      font-size: 13px;
+      opacity: .9;
     }
+    h1, h2, h3, p { margin-top: 0; }
     h1 {
-      margin: 0; text-align: center; font-size: clamp(38px, 10vw, 58px);
-      font-weight: 600; letter-spacing: .12em; text-indent: .12em;
-      text-shadow: 0 4px 24px rgba(0, 0, 0, .55);
+      margin: 0;
+      text-align: center;
+      font-size: clamp(38px, 10vw, 62px);
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-indent: .12em;
+      line-height: 1.15;
+      text-shadow: 0 4px 24px var(--shadow);
     }
     .subtitle {
-      margin: 12px auto 30px; text-align: center; color: var(--muted);
-      font-size: 14px; letter-spacing: .22em;
+      margin: 12px auto 28px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      letter-spacing: .22em;
     }
     .motto {
-      position: relative; margin: 0 0 28px; padding: 18px 20px;
-      border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
-      color: #bfb09b; text-align: center; line-height: 1.9; font-size: 14px;
+      margin: 0 0 24px;
+      padding: 18px 20px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      color: #bfb09b;
+      text-align: center;
+      font-size: 14px;
     }
     .motto strong { color: #d4b27e; font-weight: 500; }
     .chapters { display: grid; gap: 11px; }
     .chapter {
-      appearance: none; width: 100%; min-height: 78px; display: grid;
-      grid-template-columns: 58px 1fr auto; align-items: center; gap: 14px;
-      padding: 13px 16px; border: 1px solid var(--line);
+      appearance: none;
+      width: 100%;
+      min-height: 78px;
+      display: grid;
+      grid-template-columns: 58px 1fr auto;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--line);
       background: linear-gradient(135deg, rgba(40, 31, 23, .95), rgba(23, 18, 14, .96));
-      color: var(--ink); text-align: left; font: inherit; cursor: pointer;
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
       transition: transform .15s ease, border-color .15s ease, background .15s ease;
     }
-    .chapter:hover, .chapter:focus-visible {
-      transform: translateY(-1px); border-color: #846a48; outline: none;
+    .chapter:not(.disabled):hover {
+      transform: translateY(-1px);
+      border-color: #846a48;
       background: linear-gradient(135deg, rgba(50, 39, 28, .98), rgba(25, 19, 14, .98));
     }
-    .chapter.disabled { cursor: default; opacity: .58; }
+    .chapter.disabled { cursor: default; opacity: .55; }
     .chapter.disabled:hover { transform: none; }
     .num {
-      width: 48px; height: 48px; display: grid; place-items: center;
-      border: 1px solid #6a5238; color: var(--gold); font-size: 20px;
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #6a5238;
+      color: var(--gold);
+      font-size: 20px;
     }
     .copy b {
-      display: block; margin-bottom: 5px; font-weight: 500;
-      letter-spacing: .12em; font-size: 17px;
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      letter-spacing: .12em;
+      font-size: 17px;
     }
-    .copy span {
-      display: block; color: var(--muted); font-size: 12px; line-height: 1.5;
-    }
+    .copy span { display: block; color: var(--muted); font-size: 12px; line-height: 1.55; }
     .state { color: #b98f53; font-size: 12px; white-space: nowrap; }
     .disabled .state { color: #756958; }
     footer {
-      margin-top: 26px; text-align: center; color: #62584b;
-      font-size: 11px; letter-spacing: .12em; line-height: 1.8;
+      margin-top: 26px;
+      text-align: center;
+      color: #62584b;
+      font-size: 11px;
+      letter-spacing: .12em;
+      line-height: 1.8;
     }
-    @media (max-width: 380px) {
+    .hud {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .run-card, .story-card, .result-card, .grave-card, .drawer {
+      border: 1px solid var(--line-soft);
+      background: linear-gradient(180deg, rgba(35, 27, 20, .94), rgba(18, 14, 11, .94));
+      box-shadow: 0 16px 36px rgba(0, 0, 0, .18);
+    }
+    .run-card { padding: 13px 14px; }
+    .run-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    .life-title { color: var(--gold-2); letter-spacing: .08em; }
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .pill {
+      border: 1px solid rgba(196, 154, 90, .28);
+      background: rgba(11, 9, 7, .42);
+      color: #cbb89c;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .pill.danger { color: #dc9a8e; border-color: rgba(164, 77, 62, .4); background: var(--danger-soft); }
+    .progress {
+      height: 5px;
+      border: 1px solid rgba(196, 154, 90, .16);
+      background: rgba(0, 0, 0, .24);
+      overflow: hidden;
+    }
+    .progress span { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, #7b5a34, var(--gold)); transition: width .25s ease; }
+    .story-card { padding: 18px; }
+    .kicker {
+      color: var(--gold);
+      font-size: 12px;
+      letter-spacing: .16em;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    .story-card h2 {
+      margin: 0 0 12px;
+      font-size: clamp(22px, 6vw, 34px);
+      line-height: 1.25;
+      letter-spacing: .06em;
+      font-weight: 500;
+    }
+    .story-text {
+      color: #e3d2b8;
+      font-size: 16px;
+      white-space: pre-wrap;
+    }
+    .clues {
+      margin: 16px 0 0;
+      padding: 12px 14px;
+      border-left: 2px solid rgba(196, 154, 90, .56);
+      background: rgba(0, 0, 0, .2);
+      color: #c4b39a;
+      font-size: 14px;
+    }
+    .clues b { display: block; color: #d7bd8b; margin-bottom: 5px; font-weight: 500; }
+    .choices {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .choice {
+      width: 100%;
+      min-height: 56px;
+      padding: 13px 14px;
+      border: 1px solid rgba(196, 154, 90, .32);
+      background: rgba(22, 17, 13, .9);
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: rgba(228, 189, 120, .75); background: rgba(36, 27, 19, .96); }
+    .choice small { display: block; margin-top: 3px; color: var(--dim); font-size: 12px; }
+    .choice:disabled { opacity: .45; cursor: default; }
+    .result-card {
+      display: none;
+      margin-top: 14px;
+      padding: 16px;
+      border-color: rgba(196, 154, 90, .35);
+    }
+    .result-card.active { display: block; }
+    .result-card.death { border-color: rgba(164, 77, 62, .7); background: linear-gradient(180deg, rgba(54, 25, 20, .94), rgba(18, 14, 11, .96)); }
+    .result-title { color: var(--gold-2); font-size: 18px; margin-bottom: 8px; }
+    .result-card.death .result-title { color: #e0a094; }
+    .result-text { white-space: pre-wrap; color: #dfcdb4; }
+    .truth, .intel {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(196, 154, 90, .2);
+      background: rgba(0, 0, 0, .2);
+      color: #c7b596;
+      font-size: 14px;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+    .primary, .secondary {
+      min-height: 46px;
+      border-radius: 0;
+      padding: 10px 15px;
+      cursor: pointer;
+    }
+    .primary {
+      border: 1px solid rgba(228, 189, 120, .82);
+      background: linear-gradient(135deg, rgba(114, 78, 40, .94), rgba(59, 39, 25, .96));
+      color: #fff1d8;
+    }
+    .secondary {
+      border: 1px solid var(--line-soft);
+      background: rgba(16, 13, 10, .72);
+      color: var(--muted);
+    }
+    .grave-card { padding: 18px; text-align: center; }
+    .grave-seal {
+      width: 58px;
+      height: 58px;
+      border: 1px solid rgba(164, 77, 62, .72);
+      color: #d99b90;
+      display: grid;
+      place-items: center;
+      margin: 4px auto 16px;
+      letter-spacing: .15em;
+    }
+    .epitaph {
+      margin: 0 auto 16px;
+      max-width: 520px;
+      color: #ead8bd;
+      white-space: pre-wrap;
+      font-size: 17px;
+      line-height: 1.9;
+    }
+    .death-note {
+      color: #b9a68c;
+      border-top: 1px solid var(--line-soft);
+      border-bottom: 1px solid var(--line-soft);
+      padding: 12px 0;
+      margin: 14px 0;
+      white-space: pre-wrap;
+    }
+    .grave-card .actions { justify-content: center; }
+    .drawer { margin-top: 14px; padding: 14px; color: #bca98e; font-size: 14px; }
+    .drawer summary { cursor: pointer; color: var(--gold-2); min-height: 36px; display: flex; align-items: center; }
+    .log-list { margin: 8px 0 0; padding-left: 20px; }
+    .log-list li { margin: 4px 0; }
+    .hidden { display: none !important; }
+    @media (max-width: 430px) {
+      .app { padding-left: 12px; padding-right: 12px; }
       .chapter { grid-template-columns: 48px 1fr; }
       .state { grid-column: 2; }
       .num { width: 42px; height: 42px; }
+      .topbar { align-items: stretch; }
+      .ghost-link, .small-btn { font-size: 13px; padding-left: 10px; padding-right: 10px; }
+      .story-card, .grave-card { padding: 15px; }
+      .actions > button, .actions > a { flex: 1 1 150px; }
     }
   </style>
 </head>
 <body>
-  <main class="page">
-    <div class="seal" aria-hidden="true">凡人</div>
-    <h1>凡人不修仙</h1>
-    <div class="subtitle">你以為活著就算贏了？</div>
-    <div class="motto">
-      <strong>自己死 ＞ 看別人死 ＞ 讓別人死</strong><br />
-      每一次活下來，都可能只是讓你離「那個人」更近一步。
-    </div>
-    <section class="chapters" aria-label="章節選擇">
-      <button class="chapter" type="button" data-chapter="1">
-        <span class="num">壹</span>
-        <span class="copy"><b>第一章</b><span>凡人入局，先學會怎麼死。</span></span>
-        <span class="state">可進入</span>
-      </button>
-      <button class="chapter disabled" type="button" disabled>
-        <span class="num">貳</span>
-        <span class="copy"><b>第二章</b><span>活著的人，開始看見別人怎麼死。</span></span>
-        <span class="state">開發中</span>
-      </button>
-      <button class="chapter disabled" type="button" disabled>
-        <span class="num">參</span>
-        <span class="copy"><b>第三章</b><span>當求生開始需要別人付代價。</span></span>
-        <span class="state">開發中</span>
-      </button>
-      <button class="chapter disabled" type="button" disabled>
-        <span class="num">肆</span>
-        <span class="copy"><b>第四章</b><span>打了小的來了老的——只是今天的小的，是你。</span></span>
-        <span class="state">開發中</span>
-      </button>
-      <button class="chapter disabled" type="button" disabled>
-        <span class="num">伍</span>
-        <span class="copy"><b>第五章</b><span>弒龍者終成惡龍。</span></span>
-        <span class="state">開發中</span>
-      </button>
+  <main class="app" id="app">
+    <section class="screen active" id="menuScreen" aria-labelledby="gameTitle">
+      <div class="topbar">
+        <a class="ghost-link" href="./index.html">← GAME POOL</a>
+        <a class="ghost-link" href="./data/content/chapter1_full_text.md">正文主檔</a>
+      </div>
+      <div class="seal" aria-hidden="true">凡人</div>
+      <h1 id="gameTitle">凡人不修仙</h1>
+      <div class="subtitle">你以為活著就算贏了？</div>
+      <div class="motto">
+        <strong>自己死 ＞ 看別人死 ＞ 讓別人死</strong><br />
+        每一次活下來，都可能只是讓你離「那個人」更近一步。
+      </div>
+      <section class="chapters" aria-label="章節選擇">
+        <button class="chapter" type="button" id="startChapterButton">
+          <span class="num">壹</span>
+          <span class="copy"><b>第一章：村外有仙</b><span>投胎、進山、問仙、送死。這不是教學，是凡人的第一道篩選。</span></span>
+          <span class="state">可遊玩</span>
+        </button>
+        <button class="chapter disabled" type="button" disabled>
+          <span class="num">貳</span>
+          <span class="copy"><b>第二章</b><span>仙門不要我。進門不是勝利，只是換一種死法。</span></span>
+          <span class="state">開發中</span>
+        </button>
+        <button class="chapter disabled" type="button" disabled>
+          <span class="num">參</span>
+          <span class="copy"><b>第三章</b><span>修仙界想吃我。活著的人，開始看見別人怎麼死。</span></span>
+          <span class="state">開發中</span>
+        </button>
+        <button class="chapter disabled" type="button" disabled>
+          <span class="num">肆</span>
+          <span class="copy"><b>第四章</b><span>打了小的來了老的——只是今天的小的，是你。</span></span>
+          <span class="state">開發中</span>
+        </button>
+        <button class="chapter disabled" type="button" disabled>
+          <span class="num">伍</span>
+          <span class="copy"><b>第五章</b><span>弒龍者終成惡龍。</span></span>
+          <span class="state">開發中</span>
+        </button>
+      </section>
+      <footer>死亡不是答案提示。<br />你只能比上一世，更懂這個世界一點。</footer>
     </section>
-    <footer>死亡不是答案提示。<br />你只能比上一世，更懂這個世界一點。</footer>
+
+    <section class="screen" id="gameScreen" aria-labelledby="chapterTitle">
+      <div class="topbar">
+        <button class="small-btn" type="button" id="backToMenuButton">← 章節</button>
+        <button class="small-btn" type="button" id="restartRunButton">再投一世</button>
+      </div>
+      <div class="hud">
+        <div class="run-card">
+          <div class="run-meta">
+            <span class="life-title" id="chapterTitle">第一章：村外有仙</span>
+            <span id="runCounter">第 1 世</span>
+          </div>
+          <div class="stats" id="statsPanel" aria-label="目前狀態"></div>
+          <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+        </div>
+      </div>
+      <article class="story-card" aria-live="polite">
+        <div class="kicker" id="sceneKicker">投胎</div>
+        <h2 id="sceneTitle">凡人入局</h2>
+        <div class="story-text" id="storyText"></div>
+        <div class="clues" id="clueBox"></div>
+        <div class="choices" id="choiceList"></div>
+        <div class="result-card" id="resultCard" aria-live="polite">
+          <div class="result-title" id="resultTitle"></div>
+          <div class="result-text" id="resultText"></div>
+          <div class="truth" id="truthBox"></div>
+          <div class="intel" id="intelBox"></div>
+          <div class="actions" id="resultActions"></div>
+        </div>
+      </article>
+      <details class="drawer">
+        <summary>本世紀錄</summary>
+        <ol class="log-list" id="runLog"></ol>
+      </details>
+    </section>
+
+    <section class="screen" id="graveScreen" aria-labelledby="graveTitle">
+      <div class="topbar">
+        <button class="small-btn" type="button" id="graveMenuButton">← 章節</button>
+        <button class="small-btn" type="button" id="graveRestartButton">再投一世</button>
+      </div>
+      <article class="grave-card" aria-live="polite">
+        <div class="grave-seal" aria-hidden="true">墓</div>
+        <div class="kicker" id="graveKicker">此世已結</div>
+        <h2 id="graveTitle">墓誌銘</h2>
+        <div class="epitaph" id="epitaphText"></div>
+        <div class="death-note" id="deathNote"></div>
+        <div class="intel" id="graveIntel"></div>
+        <div class="actions">
+          <button class="primary" type="button" id="graveRestartPrimary">再投一世</button>
+          <button class="secondary" type="button" id="graveMenuSecondary">回章節選單</button>
+        </div>
+      </article>
+      <details class="drawer" open>
+        <summary>死前紀錄</summary>
+        <ol class="log-list" id="graveLog"></ol>
+      </details>
+    </section>
   </main>
+
   <script>
-    document.querySelector('[data-chapter="1"]').addEventListener('click', () => {
-      alert('第一章正文已完成；遊戲互動頁面下一步接入。');
-    });
+    (() => {
+      const root = document.getElementById('app');
+      if (!root || root.dataset.ready === '1') return;
+      root.dataset.ready = '1';
+
+      const $ = (id) => document.getElementById(id);
+      const screens = {
+        menu: $('menuScreen'),
+        game: $('gameScreen'),
+        grave: $('graveScreen')
+      };
+
+      const intel = {
+        family: '凡人的情報多半藏在家人的恐懼裡，不在修士的話術裡。',
+        sweetFog: '山裡最香的草，通常不是給人吃的。',
+        guarded: '真正的機緣旁邊，常常有真正能守住機緣的東西。',
+        sect: '宗門不用殺你。它只要把門檻修得夠高，凡人自己就會倒在路上。',
+        cheapChance: '主動給凡人機會的人，常常不是看見你的天分，而是看見你的便宜。',
+        otherDeath: '有時候你活下來，不是因為你更聰明，而是因為有人比你早一步犯錯。',
+        riskTransfer: '看見別人死，可以讓你多活一次。等你習慣這件事，修仙界就離你不遠了。',
+        almost: '凡人最危險的時候，不是失敗，而是差一點成功。'
+      };
+
+      const epitaphs = {
+        creek: '此地長眠著柳小春，享年三歲。\n他這一生離仙途最近的時候，\n是被村人說成「早登極樂」。',
+        miasma: '此地長眠著李小年，享年十六。\n他終於採到了仙草。\n可惜仙草先採走了他的氣。',
+        beast: '此地長眠著趙阿土，享年十八。\n他終於找到一株靈草。\n可惜那株草也早被別的東西找到了。',
+        qingyun: '此地長眠著王狗蛋，享年十七。\n他死在第九十七級台階，\n離修仙夢想尚有三十九級之遙。',
+        stone: '此地長眠著劉三，享年十九。\n青雲宗終於收下了他。\n同日，靈石庫也終於補上了人手。',
+        pill: '此地長眠著周鐵柱，享年十七。\n他拜了一位散修為師。\n師父待他很好，\n每顆丹藥都讓他先吃。',
+        bone: '此地長眠著何小山，享年十六。\n他以為自己遇見了貴人。\n後來才知道，\n貴的是他的骨頭。',
+        mundane: '此地長眠著吳平安，享年六十三。\n他一生錯過四次仙緣，\n避開五場死劫。\n村人說他沒有出息。\n他的墳前草長得最好。',
+        servant: '此地長眠著陳小滿，享年二十一。\n他終於進了青雲宗。\n只是族譜上寫的不是弟子，\n是雜役。',
+        unknown: '此地長眠著一名凡人。\n他曾以為自己只差一步。\n後來才知道，\n那一步本來就不是給他走的。'
+      };
+
+      const profiles = [
+        {
+          id: 'ordinary', weight: 70, name: '山村少年',
+          stats: { body: 2, silver: 3, debt: 1, bonds: 2, mountain: 0, sect: 0, injury: 0, greed: 0, caution: 0 },
+          text: '你活到了十六歲。這在柳溪村不算稀奇，但也不算容易。你會挑水，會砍柴，會在春荒時把半碗粥喝得像一碗。你聽過仙人，也聽過進山不歸的人。只是十六歲的人總會覺得，別人的死法輪不到自己。'
+        },
+        {
+          id: 'debt', weight: 20, name: '欠債之家',
+          stats: { body: 2, silver: 1, debt: 4, bonds: 1, mountain: 0, sect: 0, injury: 0, greed: 1, caution: 0 },
+          text: '你家欠了鎮上米鋪三兩七錢銀子。這個數字不大，卻足以讓母親在夜裡咳嗽時壓低聲音。你不是忽然想修仙，你只是忽然發現，不修仙的人也不一定能活。'
+        },
+        {
+          id: 'weak', weight: 8, name: '病後餘命',
+          stats: { body: 1, silver: 2, debt: 2, bonds: 2, mountain: 1, sect: 0, injury: 1, greed: 0, caution: 0 },
+          text: '你小時候發過一場高燒。郎中說你命硬，卻沒說你身子好。你比同齡人更懂山路上哪裡能坐下喘氣，也更懂凡人想追上別人時，最先壞掉的通常不是志氣。'
+        },
+        {
+          id: 'creek', weight: 2, name: '早夭', terminal: true,
+          text: '你三歲那年追著紙鳶跑到溪邊。大人找到你時，紙鳶在柳枝上，你在水草裡。這一世沒有選項。柳溪村的人把這叫命薄，修士把這叫凡人。',
+          death: { title: '開局殺', note: '有些人甚至活不到聽見仙字。', epitaph: epitaphs.creek, intel: intel.family }
+        }
+      ];
+
+      const scenes = {
+        mother: {
+          line: '山村少年線', title: '母親阻止進山', baseDanger: 1,
+          text: '清晨，你把柴刀磨亮，準備進山。母親坐在灶前，沒有抬頭，只問：你是不是又聽誰說山裡有仙草？\n\n鍋裡的粥很稀，灶火很小。她的聲音比灶灰還低。她不是第一次阻止你，但今天她把你的草鞋收進了屋裡。',
+          clues: ['草鞋被收進屋。', '柴刀缺口被磨平。', '灶邊有薑湯。', '母親提到王家孩子時停了一下。', '門外有人踩過濕泥，卻沒有敲門。'],
+          truths: [
+            { id: '母親知道王家孩子死於甜霧', danger: 1, intel: 'family' },
+            { id: '家中欠債，母親怕你被債逼走', danger: 1, intel: 'family' },
+            { id: '村外散修曾在你家門口停留', danger: 2, intel: 'cheapChance' },
+            { id: '她沒有額外情報，只是普通恐懼', danger: 0, intel: 'family' },
+            { id: '隔壁少年只找回一隻鞋', danger: 2, intel: 'otherDeath' }
+          ],
+          choices: [
+            { label: '聽母親說完', hint: '耗時間，換山中常識。', risk: -1, effects: { bonds: 1, mountain: 1, caution: 1 }, success: '你坐回灶前，聽母親把王家孩子的事說完。她說那孩子不是摔死的，也不是被獸吃的。他回村時一直笑，笑到嘴角裂開，最後吐出來的血帶著甜味。', next: ['hunter', 'notice', 'wanderer'] },
+            { label: '說自己只是砍柴', hint: '保住行動，失去一點信任。', risk: 1, effects: { bonds: -1, greed: 1 }, success: '你說自己只是去砍柴。母親看著你，像看著一個已經學會說謊的大人。她沒有攔你，只把半張餅塞進你懷裡。', next: ['herb', 'mist'] },
+            { label: '趁她轉身偷偷出門', hint: '最快，也最沒有準備。', risk: 3, effects: { bonds: -1, greed: 1 }, success: '你踩著牆根出去，沒有拿薑湯，也沒有問王家孩子到底怎麼死的。山路在晨霧裡看起來很短，像所有少年人的命。', next: ['herb', 'mist'] },
+            { label: '追問王家孩子', hint: '可能聽到不舒服的真相。', risk: 0, effects: { mountain: 1, sect: 1, caution: 1 }, success: '母親沉默很久，才說王家人收屍時，孩子手裡攥著半片金紋葉。那葉子後來被村長拿走，當晚村長家門口來過一個不喝井水的人。', next: ['hunter', 'wanderer'] }
+          ]
+        },
+        hunter: {
+          line: '山村少年線', title: '老獵戶的獸足', baseDanger: 2,
+          text: '老獵戶張老七把一團灰毛丟到你腳邊，說山上最近有東西下來過。\n\n那團毛不像狼毛，也不像野豬鬃。根部沾著黑泥，黑泥裡有一股說不清的腥甜。張老七今日沒帶獵犬。',
+          clues: ['灰毛根部有黑泥。', '獵戶手背有新疤。', '今日沒有帶獵犬。', '曬肉架全收空。', '他說「仙草旁邊不缺想活的東西」。'],
+          truths: [
+            { id: '灰毛來自守草妖獸', danger: 3, intel: 'guarded' },
+            { id: '只是狼群靠近村子', danger: 1, intel: 'family' },
+            { id: '那是修士放出的看守', danger: 4, intel: 'guarded' },
+            { id: '獵戶誇大危險想換酒錢', danger: 0, intel: 'family' },
+            { id: '受傷的獸比普通妖獸更容易攻擊人', danger: 2, intel: 'guarded' }
+          ],
+          choices: [
+            { label: '花錢請他細說', hint: '銀錢 -1，山中常識 +2。', risk: -2, effects: { silver: -1, mountain: 2 }, success: '張老七收了錢，才肯把灰毛攤開。他教你看根部的泥，教你聞獸經過的風，也教你記住一句話：山裡安靜的地方，不是安全，是有人不敢出聲。', next: ['herb', 'mist', 'notice'] },
+            { label: '幫他搬柴換情報', hint: '身體差的人會吃虧。', risk: 0, effects: { body: -1, mountain: 2 }, success: '你替他搬了半日柴，肩膀疼得像被石頭壓住。張老七沒有謝你，只把一枚獸齒丟給你，說遇到甜霧時咬住它，別張嘴。', next: ['mist', 'herb'] },
+            { label: '請他同行', hint: '銀錢 -2，人情 -1；有人可能替你踩雷。', risk: -2, effects: { silver: -2, bonds: -1, mountain: 1 }, flag: 'transfer', success: '張老七答應同行，但他看你的眼神不太高興。老人知道自己被請去做什麼。你也知道，只是沒有說出口。', next: ['herb', 'emptyPit'] },
+            { label: '覺得老人膽小', hint: '省下資源，但少一條命的知識。', risk: 2, effects: { greed: 1 }, success: '你笑了笑，說自己只是去看看，不會亂碰。張老七沒有反駁。他只是把灰毛收回去，像收起一塊將來要用的證據。', next: ['herb', 'mist'] },
+            { label: '讓同村少年先去問', hint: '你安全一點，但這條路很髒。', risk: -1, effects: {}, flag: 'transfer', success: '你叫王阿滿去問。王阿滿比你急，也比你窮。他聽完獵戶的話後，眼睛比你亮。你忽然明白，情報也能把人推向山裡。', next: ['emptyPit', 'mist'] }
+          ]
+        },
+        herb: {
+          line: '山中靈草線', title: '山腰發光草', baseDanger: 3,
+          text: '你在山腰看見一株泛著微光的草，葉片邊緣有淡金色紋路。\n\n它長在石縫旁，周圍沒有蟲鳴。風從谷底吹上來，帶著一點甜味。你忽然覺得，自己離仙途只剩伸手的距離。',
+          clues: ['草旁沒有蟲鳴。', '土壤被翻過。', '石縫裡有灰毛。', '淡甜味山霧。', '葉片太整齊，不像野生。', '樹幹上有淺刻痕。'],
+          truths: [
+            { id: '真低階靈草，但採摘仍可能傷身', danger: 1, reward: 'herb', intel: 'almost' },
+            { id: '瘴氣伴生草', danger: 4, death: 'miasma', intel: 'sweetFog' },
+            { id: '妖獸誘食草', danger: 5, death: 'beast', intel: 'guarded' },
+            { id: '宗門藥田外洩物', danger: 3, reward: 'markedHerb', intel: 'sect' },
+            { id: '修士設下的標記陷阱', danger: 4, intel: 'cheapChance' },
+            { id: '有人剛採過，附近留下追蹤印記', danger: 2, intel: 'otherDeath' }
+          ],
+          choices: [
+            { label: '直接採下', hint: '最快，死得也最快。', risk: 4, effects: { greed: 1 }, success: '你握住草莖，指尖傳來冰冷。那不是你想像中的仙氣，更像有什麼東西順著血管往裡鑽。', next: ['emptyPit', 'notice'] },
+            { label: '躲遠觀察', hint: '時間 +1，可能錯過。', risk: -1, effects: { caution: 1, mountain: 1 }, success: '你伏在石後等了很久。日頭偏西時，一隻灰影從石縫裡探出頭，只舔了舔葉尖就縮回去。你第一次明白，機緣也會被拿來釣魚。', next: ['emptyPit', 'notice'] },
+            { label: '先檢查足跡', hint: '山中常識越高越有用。', risk: -2, requires: 'mountain', effects: { mountain: 1 }, success: '你沒有看草，先看土。翻土邊緣有兩種痕跡：一種像獸爪，一種像靴底。這株草可能是真的，但真正危險的從來不是草。', next: ['emptyPit', 'notice', 'wanderer'] },
+            { label: '做記號回村找人', hint: '保守，但機緣不會等你。', risk: -2, effects: { caution: 1 }, success: '你用石頭做了記號，轉身回村。一路上你都在想自己是不是太膽小。等你再回來時，答案已經在土坑裡等你。', next: ['emptyPit'] },
+            { label: '找獵戶同行', hint: '花代價，也可能讓別人先死。', risk: -3, effects: { silver: -2, bonds: -1 }, flag: 'transfer', success: '張老七走在前面，先蹲下看土，又抬手讓你閉嘴。那一刻你忽然發現，請人同行不只是求助，也是在替自己找一條比較便宜的命。', next: ['emptyPit', 'notice'] },
+            { label: '放棄離開', hint: '失去機緣，但活著回村。', risk: -4, effects: { caution: 1 }, ending: 'mundane', success: '你盯著那株草很久，最後轉身。回村後沒有人稱讚你活著，大家只會問你有沒有採到仙草。凡人活下來，有時候連故事都算不上。' }
+          ],
+          deaths: {
+            miasma: { title: '甜霧入肺', note: '你採下那株草時，以為指尖的冰冷是靈氣。回村路上，你開始笑。先是輕笑，後來笑到跪在地上。母親找到你時，你嘴裡還含著半片金紋葉。', epitaph: epitaphs.miasma, intel: intel.sweetFog },
+            beast: { title: '守草妖獸', note: '你伸手的瞬間，草後石縫動了一下。不是風。你只看見一排濕亮的牙，接著就聽見自己的柴刀落地。那株草沒有被你採走，它只是又等來下一個人。', epitaph: epitaphs.beast, intel: intel.guarded }
+          }
+        },
+        mist: {
+          line: '山中靈草線', title: '甜味山霧', baseDanger: 3,
+          text: '山霧從林間漫出來，帶著一點甜味，像米糕蒸熟後揭開籠蓋的第一口氣。\n\n你想起村裡老人說過，山霧有時候會吃人。那時你只覺得老人話多。現在你才發現，話多的人通常是活得夠久。',
+          clues: ['霧甜得不自然。', '鳥聲忽然停下。', '地面有濕腳印。', '遠處有人笑。', '胸口微悶。'],
+          truths: [
+            { id: '普通霧氣，被村人傳得誇張', danger: 0, intel: 'family' },
+            { id: '真正毒瘴', danger: 5, death: 'miasma', intel: 'sweetFog' },
+            { id: '妖獸借霧遮身', danger: 4, death: 'beast', intel: 'guarded' },
+            { id: '聞入後會被符記追蹤', danger: 3, intel: 'cheapChance' },
+            { id: '靈草粉塵讓凡人短暫幻覺', danger: 3, intel: 'sweetFog' }
+          ],
+          choices: [
+            { label: '深吸一口辨認味道', hint: '這不是凡人的調查法。', risk: 5, effects: { injury: 2 }, success: '你深吸一口，想分辨霧裡有沒有靈草味。下一刻你笑了出來。你不知道自己為什麼笑，只覺得胸口有花在開。', next: ['herb'] },
+            { label: '用濕布掩口', hint: '耗掉水和布，降低風險。', risk: -2, effects: { caution: 1 }, success: '你撕下衣角沾濕，掩住口鼻。霧從眼前滑過，你看見霧裡有一串腳印，腳印走到一半就沒了。', next: ['emptyPit', 'herb'] },
+            { label: '繞路', hint: '花時間，可能碰到別的麻煩。', risk: -1, effects: { caution: 1 }, success: '你繞開霧，腿被荊棘刮得全是血。你沒死，卻在山腰多聽見一次慘叫。那聲音很短，像有人剛知道自己選錯了。', next: ['hunter', 'emptyPit', 'notice'] },
+            { label: '退回村中', hint: '錯過機緣，活著。', risk: -4, effects: { caution: 1 }, ending: 'mundane', success: '你退回村中。那天傍晚，別人問你山裡有沒有仙草。你說霧太大，看不清。沒有人知道這句話救了你一命。' }
+          ],
+          deaths: {
+            miasma: { title: '笑死山中', note: '你以為自己只是吸了一口甜霧。半個時辰後，你跪在樹根旁，笑到指甲摳進泥裡。山裡沒有仙人來收你，只有霧慢慢散開。', epitaph: epitaphs.miasma, intel: intel.sweetFog },
+            beast: { title: '霧中有獸', note: '霧裡那串腳印不是人的。你意識到這件事時，腳印已經到了你背後。', epitaph: epitaphs.beast, intel: intel.guarded }
+          }
+        },
+        emptyPit: {
+          line: '山中靈草線', title: '回村只剩土坑', baseDanger: 2,
+          text: '你做了記號，回村找人。再回山腰時，那株草不見了，只剩濕土坑與幾滴血。\n\n你蹲下看那個坑。坑很小，像一張閉上的嘴。你忽然不知道自己是錯過了機緣，還是錯過了死法。',
+          clues: ['濕土還新。', '血滴拖向林深處。', '附近沒有踩斷的草。', '你做的記號被人翻面。', '空氣裡還有淡淡甜味。'],
+          truths: [
+            { id: '同村少年先採走', danger: 2, intel: 'otherDeath' },
+            { id: '修士回收藥田外洩物', danger: 4, intel: 'sect' },
+            { id: '守草妖獸拖走誘餌', danger: 4, death: 'beast', intel: 'guarded' },
+            { id: '玩家吸入霧氣後記錯位置', danger: 1, intel: 'sweetFog' },
+            { id: '同行者也不是完全可信', danger: 2, intel: 'riskTransfer' }
+          ],
+          choices: [
+            { label: '追血跡', hint: '你想知道答案，山也想知道你的命。', risk: 4, effects: { greed: 1 }, flag: 'witness', success: '你追著血跡走進林深處。你看見一隻草鞋，一截袖子，還有王阿滿掛在樹枝上的藥簍。你沒有找到靈草，但你找到了未來某一章會用上的常識。', next: ['notice', 'wanderer'] },
+            { label: '立刻離開', hint: '沒有答案，但活著。', risk: -3, effects: { caution: 1 }, success: '你沒有追。你盯著那幾滴血看了很久，轉身下山。你不知道誰死了，但你知道這個坑不是留給你填的。至少今天不是。', next: ['notice', 'wanderer'] },
+            { label: '搜附近', hint: '可能找到線索，也可能被找到。', risk: 2, effects: { mountain: 1 }, success: '你在附近搜到一截紅繩。村裡少年常拿它綁藥簍，宗門雜役也拿它綁貨牌。你第一次發現，凡人的東西進了山，都很容易變成遺物。', next: ['notice', 'wanderer'] },
+            { label: '怪老獵戶動作太慢', hint: '保住自尊，失去人情。', risk: 0, effects: { bonds: -2, greed: 1 }, success: '你把錯怪到張老七身上。老人沒回嘴，只說你現在的樣子，像極了第一次害死人還不知道的人。', next: ['notice'] }
+          ],
+          deaths: {
+            beast: { title: '追進獸道', note: '血跡一路往裡，越走越新。你終於看見血的源頭，卻不是人，而是一張正在吃人的嘴。它抬頭看你，像看見第二份。', epitaph: epitaphs.beast, intel: intel.guarded }
+          }
+        },
+        notice: {
+          line: '青雲宗線', title: '招雜役告示', baseDanger: 2,
+          text: '鎮口貼出青雲宗告示：青雲宗招雜役，年十六至十八者，可試。\n\n人群擠在告示前，有人念出「仙門」兩字時，聲音都變輕了。你注意到，告示上沒有寫工錢，也沒有寫死了算誰的。',
+          clues: ['告示沒有寫工錢。', '回村的人很少。', '富戶子弟提前住進客棧。', '招募弟子只問身體，不問家世。', '山門旁有瘸腿雜役在掃血跡。'],
+          truths: [
+            { id: '真招雜役，但工作危險', danger: 2, intel: 'sect' },
+            { id: '靈石搬運缺人', danger: 4, death: 'stone', intel: 'almost' },
+            { id: '藥田差事缺替死鬼', danger: 5, death: 'stone', intel: 'sect' },
+            { id: '普通人只是給地方豪族陪跑', danger: 1, intel: 'sect' },
+            { id: '外門師兄私下挑探路炮灰', danger: 4, intel: 'riskTransfer' },
+            { id: '極低機率取得殘缺吐納法', danger: 1, reward: 'method', intel: 'almost' }
+          ],
+          choices: [
+            { label: '花錢前往宗門', hint: '銀錢 -2，進入山門測試。', risk: 1, effects: { silver: -2 }, success: '你把路費交出去。銅錢落進木箱的聲音很輕，卻像把你的退路一枚一枚封死。', next: ['test'] },
+            { label: '先去酒樓打聽', hint: '銀錢 -1，宗門情報 +2。', risk: -1, effects: { silver: -1, sect: 2, caution: 1 }, success: '酒樓夥計收了你的錢，說上個月也有一批少年上山。回來的只有兩個，一個瘸了，一個不敢看石頭。', next: ['test', 'wanderer'] },
+            { label: '找回村雜役問話', hint: '花時間，換真話。', risk: -1, effects: { sect: 2, caution: 1 }, success: '那名雜役不肯進村，只坐在橋頭喝冷水。他說青雲宗確實有仙人，只是仙人不一定把雜役當人。', next: ['test', 'labor'] },
+            { label: '留在村中', hint: '錯過仙門，可能活很久。', risk: -3, effects: { caution: 1 }, ending: 'mundane', success: '你沒有上山。三日後，招募隊伍離開。村裡有人笑你沒膽。半年後，他們開始說你運氣好。' },
+            { label: '偷偷混進招募隊伍', hint: '不用錢，但被抓到很慘。', risk: 4, effects: { greed: 2 }, success: '你混進隊伍，假裝自己也交了名冊。招募弟子只掃了你一眼，沒有拆穿。後來你才懂，免費的人有免費的用法。', next: ['test', 'labor'] },
+            { label: '賣掉家產準備路費', hint: '銀錢 +3，家中壓力變重。', risk: 1, effects: { silver: 3, debt: 1, greed: 1 }, success: '你賣掉田邊那棵老桑樹和半間柴房。母親沒有哭，只問你若是修不成，回來睡哪裡。', next: ['test'] }
+          ],
+          deaths: {
+            stone: { title: '仙門耗材', note: '你以為告示給的是機會。其實它只是缺一雙肯上山的腳。你走到山門時還活著，這件事本身就讓青雲宗很滿意。', epitaph: epitaphs.qingyun, intel: intel.sect }
+          }
+        },
+        test: {
+          line: '青雲宗線', title: '山門初選', baseDanger: 3,
+          text: '招募弟子坐在長桌後，桌上放著一塊青色石頭。石頭亮了就記一筆，不亮就推到另一隊。\n\n你前面的富戶少年把手按上去，青石微微亮了一下，旁邊立刻有人遞茶。輪到瘦小的鄉下少年時，石頭沒有亮，他卻不肯放手。很快，他的鼻血滴在了桌角。',
+          clues: ['青石旁放著止血布。', '有人按太久後臉色發白。', '弟子只記結果，不問疼不疼。', '另一隊的人被帶往後山。', '師兄特別看那些急著表現的人。'],
+          truths: [
+            { id: '普通靈根測試', danger: 1, intel: 'sect' },
+            { id: '青石帶靈壓，凡人硬撐會傷身', danger: 4, death: 'qingyun', intel: 'sect' },
+            { id: '測試只是分配耗材', danger: 3, intel: 'riskTransfer' },
+            { id: '名額早被富戶拿走', danger: 1, intel: 'sect' },
+            { id: '越想表現越容易被師兄記住', danger: 4, intel: 'cheapChance' }
+          ],
+          choices: [
+            { label: '老實按上去', hint: '照規矩，不硬撐。', risk: 0, effects: {}, success: '你把手按上去。青石沒有立刻亮，也沒有立刻碎。它只是冷，冷得像山裡的水。弟子看了你一眼，把你推到灰衣那隊。', next: ['labor'] },
+            { label: '用力運氣', hint: '你還沒有氣，只有命。', risk: 5, effects: { injury: 2 }, success: '你用力到指節發白，彷彿只要夠想修仙，石頭就該給你回應。青石終於亮了一瞬，你也在那一瞬聽見自己胸口有什麼裂開。', next: ['labor'] },
+            { label: '觀察前面的人', hint: '時間 +1，情報 +1。', risk: -1, effects: { sect: 1, caution: 1 }, success: '你慢了半步，先看別人怎麼按。你看見有人按得越久，臉色越白；也看見弟子只對能站穩的人點頭。於是你決定不把命證明給一塊石頭看。', next: ['labor'] },
+            { label: '問雜役要做什麼', hint: '問得太明白也會被記住。', risk: 1, effects: { sect: 1 }, success: '你問雜役要做什麼。招募弟子笑了，說凡人想進仙門，第一件事就是少問。笑聲不重，卻把你放進了另一種名冊裡。', next: ['labor'] },
+            { label: '主動說自己能吃苦', hint: '青雲宗喜歡這句話。', risk: 3, effects: { greed: 2 }, success: '你說自己能吃苦。師兄終於抬頭看你，像管事看見一頭不會喊價的騾子。', next: ['labor'] }
+          ],
+          deaths: {
+            qingyun: { title: '靈壓傷身', note: '你硬撐到青石亮起來。人群發出一聲短短的驚呼。你也想笑，卻先吐出一口血。修士說你有毅力，只是經脈太薄。凡人的毅力，原來也能把自己撐破。', epitaph: epitaphs.qingyun, intel: intel.sect }
+          }
+        },
+        labor: {
+          line: '青雲宗線', title: '搬靈石', baseDanger: 4,
+          text: '你被分到靈石庫外。地上的靈石用麻布包著，你剛碰到第一袋，就覺得掌心微微發熱。\n\n師兄說這只是小活。你看見旁邊少年的手掌已經起泡，泡裡不是水，是一點淡淡的藍光。',
+          clues: ['麻布袋微微發熱。', '旁邊少年手掌起泡。', '管事只催速度，不給手套。', '牆角有一桶冷水，水面浮著死蟲。', '搬慢的人被記名。'],
+          truths: [
+            { id: '普通搬運，但凡人仍會耗損', danger: 2, intel: 'almost' },
+            { id: '靈石有靈壓殘留', danger: 5, death: 'stone', intel: 'almost' },
+            { id: '靈石袋沾過藥田毒粉', danger: 4, death: 'stone', intel: 'sect' },
+            { id: '能撐過的人才被留下', danger: 4, intel: 'riskTransfer' },
+            { id: '師兄要看誰願意聽話', danger: 3, intel: 'cheapChance' }
+          ],
+          choices: [
+            { label: '硬搬', hint: '最像努力，也最像耗材。', risk: 4, effects: { injury: 2, body: -1 }, success: '你咬牙硬搬。每一袋都像把火塞進骨頭裡。師兄說你不錯，這句稱讚讓你忽然想吐。', ending: 'servant' },
+            { label: '要求手套', hint: '有宗門情報時比較安全。', risk: -1, effects: { sect: 1 }, success: '你問能不能拿手套。管事皺眉，但旁邊瘸腿雜役看了你一眼，丟來一副破布手套。它很臭，也救了你半條命。', ending: 'servant' },
+            { label: '偷偷少搬', hint: '保身，但被抓會失格。', risk: 0, effects: { caution: 1 }, ending: 'damaged', success: '你偷偷少搬幾袋。當晚名冊上沒有你的名字。你活著下山，卻也被青雲宗從所有可能性裡劃掉。' },
+            { label: '讓旁邊少年先碰', hint: '你會活得更像修仙界的人。', risk: -3, effects: {}, flag: 'transfer', ending: 'servant', success: '你讓旁邊少年先碰那袋發熱的靈石。他叫了一聲，手掌冒出白煙。師兄看你沒有動，反而點了點頭。你忽然覺得自己好像懂了一點規矩。' }
+          ],
+          deaths: {
+            stone: { title: '靈石入骨', note: '你搬到第三袋時，掌心已經沒有感覺。第五袋時，你聽見骨頭裡有細小的碎裂聲。第七袋還沒落地，你先倒了下去。青雲宗沒罵你，只叫下一個人補上。', epitaph: epitaphs.stone, intel: intel.almost }
+          }
+        },
+        wanderer: {
+          line: '遊方散修線', title: '青袍散修入村', baseDanger: 3,
+          text: '村口來了一名青袍散修。他看你的第一眼很久，像在看一件還沒估價的貨。\n\n他說你骨相清奇，願意帶你去見真正的仙途。村長站在旁邊，笑得比平常更和氣。',
+          clues: ['他太關心年齡、體質與家人。', '他避談師門。', '村長態度突然變好。', '他不喝村裡的井水。', '他鞋底有深泥，但近日無雨。', '他看見玉佩時眼神變了。'],
+          truths: [
+            { id: '騙盤纏的假修士', danger: 1, intel: 'cheapChance' },
+            { id: '缺試藥凡人', danger: 5, death: 'pill', intel: 'cheapChance' },
+            { id: '尋找煉丹材料', danger: 6, death: 'bone', intel: 'cheapChance' },
+            { id: '真正落魄好人，但自身難保', danger: 2, reward: 'method', intel: 'almost' },
+            { id: '被仇家追殺，帶誰誰倒楣', danger: 5, death: 'bone', intel: 'otherDeath' },
+            { id: '看中的不是你，是祖傳玉佩', danger: 4, intel: 'cheapChance' }
+          ],
+          choices: [
+            { label: '立刻拜師', hint: '機會便宜時，通常你更便宜。', risk: 5, effects: { greed: 2 }, success: '你跪得很快，快到散修臉上的笑意都沒來得及藏好。他扶你起來，掌心按在你肩上，像按住一塊剛買下的肉。', next: ['pill'] },
+            { label: '偷聽他與村長談話', hint: '風險小，但會聽見難看的事。', risk: 0, effects: { sect: 1, caution: 1 }, success: '你躲在祠堂後，聽見村長問「這次要幾個」。散修說一個就夠，太多不好帶。你忽然覺得村口那條路比山路更冷。', next: ['pill', 'notice'] },
+            { label: '問他師門來歷', hint: '追問會逼他露出縫。', risk: 1, effects: { sect: 1 }, success: '你問他師門。他笑著說仙家名諱不可輕言，卻把腰牌往袖裡藏了藏。你沒看清字，只看清腰牌邊緣有被刀削過的痕跡。', next: ['pill', 'notice'] },
+            { label: '觀察幾天', hint: '謹慎有成本；別人可能先走。', risk: -1, effects: { caution: 1 }, success: '你沒有答應。第二天，王阿滿跟他走了。第三天，王家人開始找孩子。第四天，村長說仙緣不可強求。', flag: 'witness', next: ['notice', 'emptyPit'] },
+            { label: '不理他', hint: '錯過，也保命。', risk: -3, effects: { caution: 1 }, ending: 'mundane', success: '你沒有理他。散修離村時沒有看你第二眼。那天你失去了一次仙緣，也失去了一種很可能被裝進藥爐的機會。' },
+            { label: '帶玉佩求鑑定', hint: '把自己值錢的地方亮出來。', risk: 4, effects: { greed: 3 }, success: '你拿出玉佩。散修的眼神只變了一瞬，卻足夠你後悔。他說此物與你有緣，聲音比剛才更溫柔。', next: ['pill'] }
+          ],
+          deaths: {
+            pill: { title: '試藥凡人', note: '你拜了一位散修為師。師父待你很好，第一顆丹藥讓你先吃，第二顆也讓你先吃。吃到第三顆時，你終於看見氣在身體裡流動。只是那氣流向了藥爐。', epitaph: epitaphs.pill, intel: intel.cheapChance },
+            bone: { title: '貴人看骨', note: '他說你骨相清奇。後來你才知道，他沒有說謊。你的骨頭磨成粉後，確實讓那爐丹亮了一下。', epitaph: epitaphs.bone, intel: intel.cheapChance }
+          }
+        },
+        pill: {
+          line: '遊方散修線', title: '第一顆丹藥', baseDanger: 4,
+          text: '散修遞給你一顆丹藥：吃了它，你就不再只是凡人。\n\n丹藥在他掌心滾了一下，留下淡淡黑痕。他看著你的嘴，比看你的眼睛更專心。',
+          clues: ['丹藥在掌心留下黑痕。', '他自己不碰水。', '屋外的雞忽然不叫了。', '藥香裡有鐵鏽味。', '他問你今日可曾吃飽。'],
+          truths: [
+            { id: '試毒丹', danger: 5, death: 'pill', intel: 'cheapChance' },
+            { id: '失敗洗髓丹', danger: 4, death: 'pill', intel: 'almost' },
+            { id: '真低階丹，但凡人仍可能承受不住', danger: 2, reward: 'senseQi', intel: 'almost' },
+            { id: '吃下後會被標記', danger: 3, intel: 'cheapChance' },
+            { id: '假丹藥，只是騙盤纏', danger: 0, intel: 'cheapChance' }
+          ],
+          choices: [
+            { label: '馬上吃', hint: '最像修仙，最像試藥。', risk: 5, effects: { injury: 2 }, success: '你把丹藥吞下去。它沒有入口即化，而是像一顆熱石頭滾進胃裡。你聽見散修輕輕嗯了一聲，像記下一個結果。', ending: 'method' },
+            { label: '藏起來', hint: '拖延會惹怒給機會的人。', risk: 1, effects: { caution: 1 }, success: '你假裝吞下，實際把丹藥壓在舌下。散修的笑慢慢淡了。你忽然懂了，他想看的不是你修成，是你吃下去。', next: ['notice'] },
+            { label: '給雞吃', hint: '測試很聰明，但雞不是你的。', risk: 0, effects: { caution: 1 }, success: '你把丹藥掰下一點餵雞。雞先是精神一振，接著倒在地上抽搐。散修看著雞，又看著你，說凡人果然心思多。', next: ['notice', 'emptyPit'] },
+            { label: '送郎中看', hint: '求人幫忙，會花人情。', risk: -1, effects: { bonds: -1, sect: 1 }, success: '郎中刮下一點藥粉，臉色很快變了。他說這不是補藥，至少不是補你的。你把丹藥收回去時，手指有點抖。', next: ['notice'] }
+          ],
+          deaths: {
+            pill: { title: '丹入口', note: '丹藥化開時，你真的看見了一縷氣。它從胃裡升起，穿過胸口，最後停在喉間。你想說話，卻吐出一口黑血。散修皺眉，不是難過，是覺得藥量還要改。', epitaph: epitaphs.pill, intel: intel.cheapChance }
+          }
+        }
+      };
+
+      const endings = {
+        mundane: {
+          title: '凡人苟活', type: '活下來',
+          note: '你沒有採那株草，也沒有跟散修走，更沒有賣田上青雲宗。村人說你膽小，說你錯過了仙緣。你沒有修仙，但你活得比大多數想修仙的人久。',
+          epitaph: epitaphs.mundane,
+          intel: '不修仙不是失敗。有時候，它只是你終於看懂代價。'
+        },
+        damaged: {
+          title: '經脈受損', type: '失格',
+          note: '你摸到了靈石，也摸到了青雲宗的門檻。三日後，你被抬下山。郎中說，以後少挑重物。你活著，但有些門已經永遠關上了。',
+          epitaph: epitaphs.unknown,
+          intel: intel.almost
+        },
+        servant: {
+          title: '灰衣雜役', type: '第二章入口',
+          note: '青雲宗收下了你。不是外門，不是記名，也不是弟子。你得到一塊木牌，一套灰衣，還有一張不准下山的規矩紙。你還活著，只是從今天開始，你的命有了用處。',
+          epitaph: epitaphs.servant,
+          intel: intel.sect
+        },
+        method: {
+          title: '殘缺吐納', type: '稀有入口',
+          note: '你沒有立刻成仙，也沒有立刻死。夜裡，你照著半本小冊子吐納，胸口像壓著一塊溫石。你不知道這是不是靈氣，只知道自己終於碰到了一點不該屬於凡人的東西。',
+          epitaph: epitaphs.unknown,
+          intel: intel.almost
+        }
+      };
+
+      const sceneOrder = ['mother', 'hunter', 'herb', 'mist', 'emptyPit', 'notice', 'test', 'labor', 'wanderer', 'pill'];
+      let run = null;
+      let runNumber = 0;
+
+      function showScreen(name) {
+        Object.values(screens).forEach((screen) => screen.classList.remove('active'));
+        screens[name].classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+      }
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function weightedPick(items) {
+        const total = items.reduce((sum, item) => sum + (item.weight || 1), 0);
+        let roll = Math.random() * total;
+        for (const item of items) {
+          roll -= item.weight || 1;
+          if (roll <= 0) return item;
+        }
+        return items[items.length - 1];
+      }
+
+      function pick(items) {
+        return items[Math.floor(Math.random() * items.length)];
+      }
+
+      function applyEffects(effects) {
+        if (!effects) return [];
+        const labels = [];
+        const labelMap = { body: '身體', silver: '銀錢', debt: '家債', bonds: '人情', mountain: '山識', sect: '宗門情報', injury: '傷病', greed: '貪念標記', caution: '謹慎代價' };
+        for (const key of Object.keys(effects)) {
+          const before = run.stats[key] || 0;
+          run.stats[key] = clamp(before + effects[key], 0, key === 'silver' ? 10 : 5);
+          const delta = run.stats[key] - before;
+          if (delta !== 0) labels.push(`${labelMap[key] || key} ${delta > 0 ? '+' : ''}${delta}`);
+        }
+        return labels;
+      }
+
+      function riskModifiers() {
+        let risk = 0;
+        if (run.stats.body <= 1) risk += 1;
+        if (run.stats.silver <= 1) risk += 1;
+        if (run.stats.injury >= 2) risk += 2;
+        if (run.stats.greed >= 3) risk += 1;
+        if (run.stats.mountain >= 2) risk -= 1;
+        if (run.stats.sect >= 2) risk -= 1;
+        return risk;
+      }
+
+      function statPill(label, value, dangerWhen) {
+        const danger = dangerWhen ? dangerWhen(value) : false;
+        return `<span class="pill${danger ? ' danger' : ''}">${label} ${value}</span>`;
+      }
+
+      function renderStats() {
+        const s = run.stats;
+        $('statsPanel').innerHTML = [
+          statPill('身體', s.body, (v) => v <= 1),
+          statPill('銀錢', s.silver, (v) => v <= 1),
+          statPill('家債', s.debt, (v) => v >= 4),
+          statPill('人情', s.bonds, (v) => v <= 0),
+          statPill('山識', s.mountain),
+          statPill('宗門', s.sect),
+          statPill('傷病', s.injury, (v) => v >= 2),
+          statPill('標記', s.greed, (v) => v >= 3)
+        ].join('');
+        $('progressBar').style.width = `${clamp((run.steps / 5) * 100, 0, 100)}%`;
+        $('runCounter').textContent = `第 ${runNumber} 世`;
+      }
+
+      function renderLog(targetId) {
+        const target = $(targetId);
+        target.innerHTML = run.log.map((item) => `<li>${escapeHtml(item)}</li>`).join('');
+      }
+
+      function escapeHtml(text) {
+        return String(text).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+      }
+
+      function startRun() {
+        runNumber += 1;
+        const profile = weightedPick(profiles);
+        run = {
+          profile,
+          stats: { ...(profile.stats || {}) },
+          steps: 0,
+          sceneId: 'mother',
+          truth: null,
+          flags: { witness: false, transfer: false },
+          log: []
+        };
+        if (profile.terminal) {
+          run.log.push(profile.text);
+          showGrave(profile.death);
+          return;
+        }
+        showScreen('game');
+        enterOpening(profile);
+      }
+
+      function enterOpening(profile) {
+        $('sceneKicker').textContent = '投胎';
+        $('sceneTitle').textContent = profile.name;
+        $('storyText').textContent = profile.text;
+        $('clueBox').innerHTML = '<b>本世底子</b>你不是空白角色。身體、銀錢、人情與家債，會決定同一個選項是不是送命。';
+        $('choiceList').innerHTML = '<button class="choice" type="button" id="beginLifeButton">開始這一世<small>進入第一章事件池。</small></button>';
+        $('resultCard').classList.remove('active', 'death');
+        renderStats();
+        renderLog('runLog');
+        $('beginLifeButton').addEventListener('click', () => renderScene('mother'));
+      }
+
+      function renderScene(sceneId) {
+        const scene = scenes[sceneId] || scenes.mother;
+        run.sceneId = sceneId;
+        run.truth = pick(scene.truths || [{ id: '普通危險', danger: 1, intel: 'family' }]);
+        run.steps += 1;
+        $('sceneKicker').textContent = scene.line;
+        $('sceneTitle').textContent = scene.title;
+        $('storyText').textContent = scene.text;
+        const clueCount = clamp(2 + Math.floor((run.stats.mountain + run.stats.sect) / 3), 2, scene.clues.length);
+        $('clueBox').innerHTML = `<b>可見徵兆</b>${scene.clues.slice(0, clueCount).join('<br>')}`;
+        $('resultCard').classList.remove('active', 'death');
+        $('resultTitle').textContent = '';
+        $('resultText').textContent = '';
+        $('truthBox').textContent = '';
+        $('intelBox').textContent = '';
+        $('resultActions').innerHTML = '';
+        $('choiceList').innerHTML = '';
+        scene.choices.forEach((choice, index) => {
+          const btn = document.createElement('button');
+          btn.className = 'choice';
+          btn.type = 'button';
+          btn.innerHTML = `${escapeHtml(choice.label)}<small>${escapeHtml(choice.hint || choice.strategy || '')}</small>`;
+          btn.addEventListener('click', () => resolveChoice(choice, index));
+          $('choiceList').appendChild(btn);
+        });
+        renderStats();
+        renderLog('runLog');
+      }
+
+      function resolveChoice(choice) {
+        const scene = scenes[run.sceneId];
+        document.querySelectorAll('.choice').forEach((btn) => { btn.disabled = true; });
+        if (choice.requires === 'mountain' && run.stats.mountain <= 0) {
+          choice = { ...choice, risk: (choice.risk || 0) + 3, success: '你想檢查足跡，卻只看出泥很濕。凡人缺的不是眼睛，是知道該看哪裡。' };
+        }
+        const effectLabels = applyEffects(choice.effects);
+        if (choice.flag === 'transfer') run.flags.transfer = true;
+        if (choice.flag === 'witness') run.flags.witness = true;
+        const risk = Math.max(0, scene.baseDanger + (run.truth.danger || 0) + (choice.risk || 0) + riskModifiers());
+        const chance = clamp(risk / 12, 0.03, 0.88);
+        const forceSafe = choice.ending === 'mundane';
+        const died = !forceSafe && Math.random() < chance;
+        run.log.push(`${scene.title}：${choice.label}`);
+        renderStats();
+        renderLog('runLog');
+        if (died) {
+          const death = chooseDeath(scene, run.truth);
+          showResult(true, death.title, death.note, run.truth.id, death.intel, effectLabels, () => showGrave(death));
+          return;
+        }
+        if (choice.ending) {
+          const ending = endings[choice.ending] || endings.mundane;
+          showResult(false, ending.title, `${choice.success}\n\n${ending.note}`, run.truth.id, ending.intel, effectLabels, () => showGrave({ title: ending.type, note: ending.note, epitaph: ending.epitaph, intel: ending.intel }));
+          return;
+        }
+        const nextId = chooseNext(choice.next || nextCandidates(run.sceneId));
+        let result = choice.success || '你暫時活了下來。但凡人活下來，通常只是進入下一個更貴的選項。';
+        if (effectLabels.length) result += `\n\n狀態變化：${effectLabels.join('、')}`;
+        showResult(false, '暫時活著', result, run.truth.id, intel[run.truth.intel] || intel.family, [], () => {
+          if (run.steps >= 5) {
+            const ending = chooseChapterEnding();
+            showGrave({ title: ending.type, note: ending.note, epitaph: ending.epitaph, intel: ending.intel });
+          } else {
+            renderScene(nextId);
+          }
+        });
+      }
+
+      function chooseDeath(scene, truth) {
+        if (truth.death && scene.deaths && scene.deaths[truth.death]) return scene.deaths[truth.death];
+        if (scene.deaths) {
+          const keys = Object.keys(scene.deaths);
+          if (keys.length) return scene.deaths[pick(keys)];
+        }
+        return { title: '死於資訊差', note: '你不是完全沒有選擇。你只是沒有足夠的錢、命、時間與情報，去承擔選錯的代價。', epitaph: epitaphs.unknown, intel: intel.family };
+      }
+
+      function nextCandidates(sceneId) {
+        const index = sceneOrder.indexOf(sceneId);
+        const later = sceneOrder.slice(Math.max(0, index + 1));
+        return later.length ? later.slice(0, 3) : ['notice', 'wanderer'];
+      }
+
+      function chooseNext(candidates) {
+        const valid = candidates.filter((id) => scenes[id]);
+        return valid.length ? pick(valid) : 'notice';
+      }
+
+      function chooseChapterEnding() {
+        if (run.flags.transfer) return { ...endings.servant, intel: intel.riskTransfer };
+        if (run.stats.injury >= 3) return endings.damaged;
+        if (run.stats.sect >= 2 && run.stats.body >= 2) return endings.servant;
+        if (run.stats.mountain >= 2 && run.stats.greed <= 1) return endings.mundane;
+        return pick([endings.mundane, endings.damaged, endings.servant]);
+      }
+
+      function showResult(isDeath, title, text, truthText, intelText, effectLabels, nextAction) {
+        const card = $('resultCard');
+        card.classList.add('active');
+        card.classList.toggle('death', Boolean(isDeath));
+        $('resultTitle').textContent = isDeath ? `死劫：${title}` : title;
+        let output = text;
+        if (effectLabels && effectLabels.length) output += `\n\n狀態變化：${effectLabels.join('、')}`;
+        $('resultText').textContent = output;
+        $('truthBox').textContent = `本次背後真相：${truthText}`;
+        $('intelBox').textContent = `死後/事後情報：${intelText}`;
+        $('resultActions').innerHTML = '';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = isDeath ? 'primary' : 'primary';
+        btn.textContent = isDeath ? '立碑' : '繼續';
+        btn.addEventListener('click', nextAction);
+        $('resultActions').appendChild(btn);
+      }
+
+      function showGrave(data) {
+        showScreen('grave');
+        $('graveKicker').textContent = data.title || '此世已結';
+        $('epitaphText').textContent = data.epitaph || epitaphs.unknown;
+        $('deathNote').textContent = data.note || '此世已結。';
+        $('graveIntel').textContent = `世界情報：${data.intel || intel.family}`;
+        renderLog('graveLog');
+      }
+
+      $('startChapterButton').addEventListener('click', startRun);
+      $('restartRunButton').addEventListener('click', startRun);
+      $('graveRestartButton').addEventListener('click', startRun);
+      $('graveRestartPrimary').addEventListener('click', startRun);
+      $('backToMenuButton').addEventListener('click', () => showScreen('menu'));
+      $('graveMenuButton').addEventListener('click', () => showScreen('menu'));
+      $('graveMenuSecondary').addEventListener('click', () => showScreen('menu'));
+    })();
   </script>
 </body>
 </html>
