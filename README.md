@@ -41,7 +41,8 @@
 
 - `docs/PROJECT_CORE_CARD.md`：專案核心卡
 - `docs/DESIGN_CONSTITUTION.md`：核心設計憲法
-- `docs/CHAPTER_PLAN.md`：四章結構
+- `docs/CHAPTER_PLAN.md`：五章結構與主題曲線
+- `docs/CONTENT_SCALE_AND_WORDCOUNT.md`：五章 × 每章約五萬字的內容規模規格
 - `docs/MVP_SCOPE.md`：MVP 範圍與驗證問題
 - `docs/CHAPTER_1_RESTRUCTURE.md`：第一章重構方向
 - `docs/EVENT_TEMPLATE.md`：事件模板
