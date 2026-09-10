@@ -179,18 +179,111 @@
     .scene-paragraph {
       margin: 0;
       font-size: 15px;
-      line-height: 1.95;
+      line-height: 2.02;
       color: #c5a06a;
       text-indent: 2em;
-      letter-spacing: .04em;
+      letter-spacing: .045em;
+      min-height: 1.8em;
       opacity: 0;
-      transform: translateY(4px);
-      animation: fadeText .24s ease forwards;
+      transform: translateY(5px);
+      transition: opacity .55s ease, transform .55s ease, color .55s ease;
     }
 
-    .scene-paragraph:first-line { color: #d4b080; }
+    .scene-paragraph.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
-    @keyframes fadeText {
+    .scene-paragraph.is-typing::after {
+      content: '▌';
+      display: inline-block;
+      margin-left: 2px;
+      color: rgba(210, 160, 80, .9);
+      animation: cursorBlink .88s steps(2, start) infinite;
+    }
+
+    .scene-paragraph.is-complete:first-line { color: #d4b080; }
+
+    @keyframes cursorBlink { 50% { opacity: 0; } }
+
+    .atmosphere-panel {
+      margin: -8px 0 20px;
+      border: 1px solid rgba(130, 90, 34, .22);
+      background: linear-gradient(180deg, rgba(15, 9, 3, .72), rgba(26, 15, 5, .46));
+      padding: 10px 12px 11px;
+      box-shadow: inset 0 1px 0 rgba(220, 170, 80, .04), 0 10px 22px rgba(0,0,0,.16);
+    }
+
+    .atmosphere-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .atmosphere-label {
+      color: #6b4f28;
+      font-size: 11px;
+      letter-spacing: .22em;
+      white-space: nowrap;
+    }
+
+    .reading-hint {
+      min-width: 0;
+      color: #5f4a2c;
+      font-size: 11px;
+      line-height: 1.4;
+      text-align: right;
+      letter-spacing: .06em;
+    }
+
+    .fate-meter {
+      position: relative;
+      height: 4px;
+      overflow: hidden;
+      background: rgba(60, 42, 18, .72);
+      border-radius: 99px;
+      box-shadow: inset 0 0 0 1px rgba(180, 130, 50, .08);
+    }
+
+    .fate-meter-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, rgba(110, 70, 25, .55), rgba(200, 143, 63, .82), rgba(120, 38, 20, .7));
+      transition: width .62s ease;
+      box-shadow: 0 0 12px rgba(190, 115, 45, .26);
+    }
+
+    .text-tools {
+      display: flex;
+      justify-content: center;
+      margin-top: 11px;
+    }
+
+    .skip-text-btn {
+      min-height: 34px;
+      border: 1px solid rgba(150, 105, 40, .28);
+      background: rgba(20, 12, 4, .72);
+      color: #7f6238;
+      padding: 6px 11px;
+      font-size: 12px;
+      letter-spacing: .08em;
+      cursor: pointer;
+    }
+
+    .skip-text-btn:disabled {
+      opacity: .46;
+      cursor: default;
+    }
+
+    .choices-container {
+      opacity: 0;
+      transform: translateY(8px);
+      animation: choicesEnter .46s ease forwards;
+    }
+
+    @keyframes choicesEnter {
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -1418,7 +1511,19 @@
       let state = { ...INITIAL };
       let sceneKey = 'intro';
       let timer = null;
+      let typingTimer = null;
       let runToken = 0;
+      let activeReveal = null;
+      const TYPE_DELAY_MS = 46;
+      const PUNCTUATION_DELAY_MS = 260;
+      const PARAGRAPH_PAUSE_MS = 720;
+
+      function clearTimers() {
+        clearTimeout(timer);
+        clearTimeout(typingTimer);
+        if (activeReveal) activeReveal.cancelled = true;
+        activeReveal = null;
+      }
 
       function clamp(n, min, max) {
         return Math.max(min, Math.min(max, n));
@@ -1457,7 +1562,7 @@
       }
 
       function choose(choice) {
-        clearTimeout(timer);
+        clearTimers();
         applyChoice(choice);
         go(choice.next);
       }
@@ -1471,7 +1576,7 @@
       }
 
       function renderScene() {
-        clearTimeout(timer);
+        clearTimers();
         const token = ++runToken;
         const scene = SCENES[sceneKey];
         updateStatus(scene);
@@ -1486,18 +1591,100 @@
           <div class="scene-chapter">${escapeHtml(scene.chapter || '第一章')}</div>
           <h1 class="scene-title">${escapeHtml(scene.title || '')}</h1>
           <div class="scene-rule" aria-hidden="true"></div>
-          <div class="scene-paragraphs">
-            ${paragraphs.map((p, idx) => `<p class="scene-paragraph" style="animation-delay:${idx * 90}ms">${escapeHtml(p)}</p>`).join('')}
+          <div class="atmosphere-panel" aria-live="polite">
+            <div class="atmosphere-top">
+              <div class="atmosphere-label">命運氣息</div>
+              <div class="reading-hint" id="readingHint">文字正在浮現，選項尚未出現。</div>
+            </div>
+            <div class="fate-meter" aria-hidden="true"><div class="fate-meter-fill" id="fateMeterFill"></div></div>
+            <div class="text-tools"><button class="skip-text-btn" type="button" id="skipTextBtn">快進文字</button></div>
           </div>
-          ${scene.autoNext ? '<div class="auto-wait" aria-label="命運正在翻牌"><span>命</span></div>' : renderChoices(choices)}
+          <div class="scene-paragraphs" id="paragraphMount"></div>
+          <div id="choiceMount"></div>
         `;
         content.scrollTop = 0;
-        attachChoiceHandlers(choices);
+        revealSceneText({ scene, paragraphs, choices, token });
+      }
+
+      function waitFor(ms, token, controller) {
+        return new Promise(resolve => {
+          if (controller.cancelled || token !== runToken || controller.skipAll) return resolve();
+          timer = setTimeout(resolve, ms);
+        });
+      }
+
+      function typeParagraph(node, text, token, controller) {
+        return new Promise(resolve => {
+          let idx = 0;
+          let done = false;
+          const finish = () => {
+            if (done) return;
+            done = true;
+            clearTimeout(typingTimer);
+            node.textContent = text;
+            node.classList.remove('is-typing');
+            node.classList.add('is-complete');
+            resolve();
+          };
+          controller.finishCurrent = finish;
+          node.classList.add('is-visible', 'is-typing');
+          const step = () => {
+            if (controller.cancelled || token !== runToken) return resolve();
+            if (controller.skipAll) return finish();
+            idx += 1;
+            node.textContent = text.slice(0, idx);
+            if (idx >= text.length) return finish();
+            const prev = text[idx - 1] || '';
+            const pause = '。！？；……'.includes(prev) ? PUNCTUATION_DELAY_MS : TYPE_DELAY_MS;
+            typingTimer = setTimeout(step, pause);
+          };
+          step();
+        });
+      }
+
+      async function revealSceneText({ scene, paragraphs, choices, token }) {
+        const paragraphMount = content.querySelector('#paragraphMount');
+        const choiceMount = content.querySelector('#choiceMount');
+        const fill = content.querySelector('#fateMeterFill');
+        const hint = content.querySelector('#readingHint');
+        const skipBtn = content.querySelector('#skipTextBtn');
+        const controller = { cancelled: false, skipAll: false, finishCurrent: null };
+        activeReveal = controller;
+        if (skipBtn) {
+          skipBtn.addEventListener('click', () => {
+            controller.skipAll = true;
+            if (controller.finishCurrent) controller.finishCurrent();
+          });
+        }
+        for (let i = 0; i < paragraphs.length; i += 1) {
+          if (controller.cancelled || token !== runToken) return;
+          const node = document.createElement('p');
+          node.className = 'scene-paragraph';
+          paragraphMount.appendChild(node);
+          await typeParagraph(node, String(paragraphs[i] ?? ''), token, controller);
+          if (controller.cancelled || token !== runToken) return;
+          if (fill) fill.style.width = `${Math.round(((i + 1) / Math.max(paragraphs.length, 1)) * 100)}%`;
+          if (hint) hint.textContent = i + 1 >= paragraphs.length ? '正文已讀完，現在才輪到你。' : '文字仍在繼續，先別急著選。';
+          content.scrollTo({ top: content.scrollHeight, behavior: controller.skipAll ? 'auto' : 'smooth' });
+          await waitFor(PARAGRAPH_PAUSE_MS, token, controller);
+        }
+        if (controller.cancelled || token !== runToken) return;
+        if (skipBtn) {
+          skipBtn.textContent = scene.autoNext ? '命運翻牌中' : '可以抉擇了';
+          skipBtn.disabled = true;
+        }
+        if (hint) hint.textContent = scene.autoNext ? '正文已讀完，命運正在翻牌。' : '正文已讀完，選項才會出現。';
+        if (scene.autoNext) {
+          choiceMount.innerHTML = '<div class="auto-wait" aria-label="命運正在翻牌"><span>命</span></div>';
+        } else {
+          choiceMount.innerHTML = renderChoices(choices);
+          attachChoiceHandlers(choices);
+        }
         const autoDest = getRandomAuto(scene);
         if (autoDest) {
           timer = setTimeout(() => {
             if (token === runToken) go(autoDest);
-          }, scene.waitMs || 900);
+          }, scene.waitMs || 1350);
         }
       }
 
@@ -1603,7 +1790,7 @@
       }
 
       function restart() {
-        clearTimeout(timer);
+        clearTimers();
         state = { ...INITIAL, deaths: state.deaths };
         sceneKey = 'intro';
         renderScene();
