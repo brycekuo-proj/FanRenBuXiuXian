@@ -84,7 +84,7 @@
     .card {
       --accent: #78e4ff;
       position: relative;
-      min-height: 300px;
+      min-height: 220px;
       grid-column: span 2;
       display: flex;
       flex-direction: column;
@@ -108,7 +108,7 @@
       box-shadow: 0 22px 65px color-mix(in srgb, var(--accent) 12%, rgba(0,0,0,.46));
       outline: none;
     }
-    .card.featured { grid-column: span 3; min-height: 375px; }
+    .card.featured { grid-column: span 3; min-height: 260px; }
     .card::before {
       content: "";
       position: absolute;
@@ -127,18 +127,6 @@
       border-radius: 50%; color: var(--accent); font-size: 18px; transition: background .2s ease, transform .2s ease;
     }
     a.card:hover .arrow { background: var(--accent); color: #090b11; transform: rotate(-12deg); }
-    .art { position: relative; height: 132px; display: grid; place-items: center; }
-    .featured .art { height: 180px; }
-    .sigil { position: relative; width: 108px; height: 108px; display: grid; place-items: center; color: var(--accent); }
-    .sigil::before, .sigil::after { content: ""; position: absolute; inset: 5px; border: 1px solid currentColor; opacity: .55; }
-    .sigil::before { border-radius: 31% 69% 56% 44% / 58% 35% 65% 42%; animation: turn 17s linear infinite; }
-    .sigil::after { inset: 20px; border-radius: 50%; opacity: .25; animation: turn 11s linear infinite reverse; }
-    .glyph { font-size: 44px; font-weight: 250; text-shadow: 0 0 28px currentColor; }
-    .echo .sigil::before { border-radius: 2px; transform: rotate(45deg); animation-duration: 24s; }
-    .fanren .sigil::before { border-radius: 50% 50% 8% 50%; transform: rotate(45deg); }
-    .mahjong .sigil::before { border-radius: 9px; box-shadow: inset 0 0 0 8px rgba(255,255,255,.018); }
-    .party .sigil::before { border-radius: 50%; border-style: dashed; }
-    @keyframes turn { to { transform: rotate(360deg); } }
     .copy small { display: block; margin-bottom: 8px; color: var(--accent); font-size: 10px; letter-spacing: .16em; font-weight: 700; }
     .copy h2 { margin: 0 0 9px; font-size: clamp(24px, 3vw, 35px); line-height: 1; letter-spacing: -.035em; }
     .copy p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.65; }
@@ -156,14 +144,12 @@
     }
     .slot {
       --accent: #7f8798;
-      min-height: 300px;
+      min-height: 220px;
       border-style: dashed;
       background: rgba(14, 17, 25, .54);
       opacity: .72;
     }
     .slot::before { opacity: .045; }
-    .slot .sigil::before { border-style: dashed; }
-    .slot .glyph { font-size: 38px; font-weight: 200; }
     footer {
       display: flex; justify-content: space-between; align-items: center; gap: 20px;
       margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--line);
@@ -171,9 +157,8 @@
     }
     @media (max-width: 800px) {
       .grid { grid-template-columns: 1fr 1fr; }
-      .card, .card.featured { grid-column: span 1; min-height: 300px; }
+      .card, .card.featured { grid-column: span 1; min-height: 230px; }
       .card:last-child { grid-column: 1 / -1; }
-      .featured .art { height: 132px; }
     }
     @media (max-width: 560px) {
       .shell { width: min(100% - 26px, 460px); }
@@ -181,9 +166,7 @@
       .count { display: none; }
       h1 { font-size: clamp(54px, 18vw, 82px); }
       .grid { grid-template-columns: 1fr; gap: 11px; }
-      .card, .card.featured, .card:last-child { grid-column: 1; min-height: 270px; border-radius: 20px; }
-      .art, .featured .art { height: 110px; }
-      .sigil { width: 92px; height: 92px; }
+      .card, .card.featured, .card:last-child { grid-column: 1; min-height: 220px; border-radius: 20px; }
       footer { align-items: flex-start; flex-direction: column; }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -205,32 +188,26 @@
     <section class="grid" aria-label="遊戲與專案">
       <a class="card featured aituber" href="https://github.com/brycekuo-proj/AITuber" aria-label="前往 AITuber">
         <div class="topline"><span class="tag">AI CHARACTER</span><span class="arrow" aria-hidden="true">↗</span></div>
-        <div class="art"><div class="sigil"><span class="glyph">靈</span></div></div>
         <div class="copy"><small>01 / UNIVERSAL AI SKIN</small><h2>AITuber</h2><p>讓同一個角色陪你穿梭不同 AI。Listening、Thinking、Speaking，都有自己的呼吸與反應。</p></div>
       </a>
       <a class="card featured echo" href="https://brycekuo-proj.github.io/midnight-line-echo/" aria-label="進入 ECHO">
         <div class="topline"><span class="tag">PSYCHOLOGICAL HORROR</span><span class="arrow" aria-hidden="true">↗</span></div>
-        <div class="art"><div class="sigil"><span class="glyph">◉</span></div></div>
         <div class="copy"><small>02 / 02:41 AM</small><h2>ECHO</h2><p>低飽和、手機實拍感的心理恐怖。你看到的異常，可能比你記得的事更可靠。</p></div>
       </a>
       <a class="card fanren" href="./fanren.html" aria-label="進入凡人不修仙">
         <div class="topline"><span class="tag">TEXT ROGUELIKE</span><span class="arrow" aria-hidden="true">↗</span></div>
-        <div class="art"><div class="sigil"><span class="glyph">凡</span></div></div>
         <div class="copy"><small>03 / DEATH &amp; REBIRTH</small><h2>凡人不修仙</h2><p>自己死、看別人死、讓別人死。每次輪迴只讓你更懂這個世界，不會給你標準答案。</p></div>
       </a>
       <article class="card mahjong locked" aria-disabled="true">
         <div class="topline"><span class="tag">STRATEGY TD</span><span class="arrow" aria-hidden="true">封</span></div>
-        <div class="art"><div class="sigil"><span class="glyph">將</span></div></div>
         <div class="copy"><small>04 / DEVELOPMENT</small><h2>麻將三國塔防</h2><p>牌型、武將與塔防節奏交疊的策略實驗。此入口暫時封印，不開啟連結。</p></div>
       </article>
       <a class="card party" href="https://github.com/brycekuo-proj/PartyCameraGame" aria-label="前往 Party Cam">
         <div class="topline"><span class="tag">CAMERA PARTY</span><span class="arrow" aria-hidden="true">↗</span></div>
-        <div class="art"><div class="sigil"><span class="glyph">⌾</span></div></div>
         <div class="copy"><small>05 / MOVE TO SURVIVE</small><h2>Party Cam</h2><p>手機相機化身派對遊樂場。閃過雷射危險區，用身體完成五關 SAFE／HIT 挑戰。</p></div>
       </a>
       <article class="card slot" aria-label="保留的新遊戲項目位置">
         <div class="topline"><span class="tag">NEXT PROJECT</span><span class="arrow" aria-hidden="true">＋</span></div>
-        <div class="art"><div class="sigil"><span class="glyph">?</span></div></div>
         <div class="copy"><small>06 / RESERVED SLOT</small><h2>下一個世界</h2><p>保留給未來的新遊戲。項目確認後，可直接替換這張卡片並加入入口。</p></div>
       </article>
     </section>
