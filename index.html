@@ -102,6 +102,7 @@
       isolation: isolate;
       transition: transform .28s ease, border-color .28s ease, box-shadow .28s ease;
     }
+    .card[hidden] { display: none; }
     a.card:hover, a.card:focus-visible {
       transform: translateY(-5px);
       border-color: color-mix(in srgb, var(--accent) 62%, transparent);
@@ -178,12 +179,12 @@
   <main class="shell">
     <header>
       <div class="brand"><span class="brand-mark" aria-hidden="true"></span>BRYCE AI STUDIO</div>
-      <div class="count">GAME POOL / 005 + NEXT</div>
+      <div class="count">GAME POOL / 004 + NEXT</div>
     </header>
     <section class="hero">
       <div class="eyebrow">Playable worlds in progress</div>
       <h1>GAME <span>POOL</span></h1>
-      <p class="intro">五個正在成形的世界。從 AI 角色皮膚、心理恐怖到修仙死亡輪迴與手機體感——選一個入口，看看它現在長到哪裡。</p>
+      <p class="intro">四個正在成形的世界。從 AI 角色皮膚、心理恐怖到修仙死亡輪迴與手機體感——選一個入口，看看它現在長到哪裡。</p>
     </section>
     <section class="grid" aria-label="遊戲與專案">
       <a class="card featured echo" href="https://brycekuo-proj.github.io/midnight-line-echo/" aria-label="進入 ECHO">
@@ -202,13 +203,13 @@
         <div class="topline"><span class="tag">APK DOWNLOAD</span><span class="arrow" aria-hidden="true">↓</span></div>
         <div class="copy"><small>04 / MOVE TO SURVIVE</small><h2>Party Cam</h2><p>手機相機化身派對遊樂場。閃過雷射危險區，用身體完成五關 SAFE／HIT 挑戰。</p></div>
       </a>
-      <article class="card mahjong locked" aria-disabled="true">
+      <article class="card mahjong locked" aria-disabled="true" hidden>
         <div class="topline"><span class="tag">STRATEGY TD</span><span class="arrow" aria-hidden="true">封</span></div>
         <div class="copy"><small>05 / DEVELOPMENT</small><h2>麻將三國塔防</h2><p>牌型、武將與塔防節奏交疊的策略實驗。此入口暫時封印，不開啟連結。</p></div>
       </article>
       <article class="card slot" aria-label="保留的新遊戲項目位置">
         <div class="topline"><span class="tag">NEXT PROJECT</span><span class="arrow" aria-hidden="true">＋</span></div>
-        <div class="copy"><small>06 / RESERVED SLOT</small><h2>下一個世界</h2><p>保留給未來的新遊戲。項目確認後，可直接替換這張卡片並加入入口。</p></div>
+        <div class="copy"><small>05 / RESERVED SLOT</small><h2>下一個世界</h2><p>保留給未來的新遊戲。項目確認後，可直接替換這張卡片並加入入口。</p></div>
       </article>
     </section>
     <footer><span>BUILD SMALL · TEST REAL · GROW WORLDS</span><span>© 2026 BRYCE AI STUDIO</span></footer>
