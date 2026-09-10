@@ -12,6 +12,8 @@
 
 第一章互動頁節奏已修正：正文改為逐字浮現，加入「命運氣息」氛圍條與閱讀提示；選項必須等所有正文跑完才會出現，避免破壞文字 Roguelike 的閱讀氛圍。
 
+第二章《山門不渡凡人》正文第一版已完成並落檔：`data/content/chapter2_full_text.md`，另保留 `data/content/chapter2_parts/` 九個可維護分段。主檔目前為 55,940 個 Unicode 字元、210 個 `ch2.*` 正文區段，內容不是骨架，已實作靈根測試、雜役契約、靈石搬運、藥田、師兄利用、外門規矩、殘缺功法、外門補錄、宗門耗材、凡人/記名/外門等收束與第三章坊市伏筆。
+
 ## 本機資料夾
 
 `Games/FanRenBuXiuXian`
@@ -32,7 +34,7 @@
 2. 將 `chapter1_full_text.md` 更細拆分映射到 runtime 可抽取的 scene / choice / death / epitaph blocks。
 3. 進行第一章 20～30 次輪迴測試，檢查是否符合死亡曲線與「死後想再投一世」。
 4. 依實測補足更多事件變體與特殊死法。
-5. 第二章暫不開發，只保留入口提示。
+5. 將第二章 55,940 字正文映射為 runtime 可抽取的 scene / choice / death / epitaph blocks，並在第一章結束後接入第二章互動頁。
 
 ## 禁止膨脹項目
 
