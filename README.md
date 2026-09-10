@@ -37,6 +37,8 @@
 
 目前不要擴章，不做大型系統。先集中重構第一章，讓死亡有伏筆、苟住有代價、墓誌銘值得截圖，並驗證玩家死後是否會想立刻再投一世。
 
+第一章已新增 5～6 萬字正文主檔：`data/content/chapter1_full_text.md`。此檔不是骨架，而是可直接拆入遊戲事件池、選項結果、死亡畫面、墓誌銘與死後情報的正文內容。既有 JSON 與事件圖則保留作 runtime 接入用。
+
 ## 文件索引
 
 - `docs/PROJECT_CORE_CARD.md`：專案核心卡
@@ -45,9 +47,14 @@
 - `docs/CONTENT_SCALE_AND_WORDCOUNT.md`：五章 × 每章約五萬字的內容規模規格
 - `docs/MVP_SCOPE.md`：MVP 範圍與驗證問題
 - `docs/CHAPTER_1_RESTRUCTURE.md`：第一章重構方向
+- `docs/CHAPTER_1_IMPLEMENTATION.md`：第一章實作規格
 - `docs/EVENT_TEMPLATE.md`：事件模板
 - `docs/BALANCE_TARGETS.md`：存活率與節奏目標
 - `docs/COPYWRITING_GUIDE.md`：文案口吻規範
 - `docs/EPITAPH_SYSTEM.md`：墓誌銘系統
 - `data/events/chapter1_seed_events.md`：第一章種子事件
+- `data/events/chapter1_implementation.json`：第一章機器可讀事件資料
+- `data/events/chapter1_event_graph.md`：第一章事件流與分支圖
+- `data/events/chapter1_content_blocks.md`：第一章人工可讀文案池
+- `data/content/chapter1_full_text.md`：第一章 5～6 萬字正文主檔
 - `data/epitaphs/epitaph_seed_bank.md`：墓誌銘素材庫

@@ -1,0 +1,388 @@
+{
+  "schema_version": "chapter_content_v1",
+  "chapter_id": "ch1",
+  "title": "村外有仙",
+  "formal_word_target": 50000,
+  "theme": {
+    "chapter_theme": "自己死",
+    "long_arc": "自己死 → 看別人死 → 讓別人死",
+    "core_sentence": "凡人不是輸在笨，而是輸在沒有承擔資訊錯誤的本錢。",
+    "foreshadowing": [
+      "同村少年先死，玩家獲得情報。",
+      "獵戶或同伴替玩家承擔危險。",
+      "保守選項可以保命，但可能讓別人先踩雷。",
+      "宗門與散修都會把危險向下轉嫁。"
+    ]
+  },
+  "runtime_contract": {
+    "single_run_target_seconds": [30, 120],
+    "chapter_capacity_rule": "本檔是第一章五萬字容量的資料骨架與代表性內容，不代表單局讀完五萬字。",
+    "no_fixed_solution": true,
+    "surface_event_truth_separation": true,
+    "choice_represents_strategy_not_answer": true,
+    "death_requires_foreshadowing": true,
+    "intel_must_not_reveal_button_solution": true
+  },
+  "state_variables": [
+    { "id": "body", "range": [0, 5], "default": 2, "description": "身體底子；影響山路、瘴氣、靈壓、搬運。" },
+    { "id": "silver", "range": [0, 10], "default": 3, "description": "銀錢；影響打聽、路費、請獵戶。" },
+    { "id": "family_debt", "range": [0, 5], "default": 1, "description": "家中負債；提高被迫出村與賣家產壓力。" },
+    { "id": "village_bonds", "range": [0, 5], "default": 2, "description": "村中人情；影響母親、獵戶、郎中幫助。" },
+    { "id": "mountain_lore", "range": [0, 5], "default": 0, "description": "山野常識；影響足跡、獸毛、霧氣判斷。" },
+    { "id": "sect_rumor", "range": [0, 5], "default": 0, "description": "宗門情報；影響青雲宗線選項。" },
+    { "id": "injury", "range": [0, 5], "default": 0, "description": "傷病；提高後續死亡率。" },
+    { "id": "caution_debt", "range": [0, 5], "default": 0, "description": "謹慎造成的時間與機會成本。" },
+    { "id": "greed_mark", "range": [0, 5], "default": 0, "description": "被騙子、師兄、散修盯上的傾向。" },
+    { "id": "witnessed_death", "type": "boolean", "default": false, "description": "是否看見別人先死；第三章伏筆。" },
+    { "id": "transferred_risk", "type": "boolean", "default": false, "description": "是否讓別人承擔風險；第五章伏筆。" }
+  ],
+  "survival_targets_mvp": {
+    "survive_youth": 0.8,
+    "leave_village": 0.55,
+    "survive_after_opportunity_contact": 0.3,
+    "obtain_real_breathing_method": [0.1, 0.15],
+    "sense_qi": [0.03, 0.05],
+    "qi_entry": 0.01
+  },
+  "death_curve": {
+    "formula_note": "死亡風險由事件危險、角色弱點、傷病、資訊差與準備代價共同決定，不使用純隨機亂殺。",
+    "modifiers": [
+      { "id": "weak_body", "condition": "body <= 1", "risk_delta": 2, "note": "山路、台階、靈壓、搬運風險提高。" },
+      { "id": "no_money", "condition": "silver <= 1", "risk_delta": 1, "note": "無法打聽、買藥、請獵戶，容易被迫冒進。" },
+      { "id": "wounded", "condition": "injury >= 2", "risk_delta": 2, "note": "連低危事件都可能變成死亡。" },
+      { "id": "has_mountain_lore", "condition": "mountain_lore >= 2", "risk_delta": -1, "note": "能讀懂霧氣、獸跡、翻土。" },
+      { "id": "has_sect_rumor", "condition": "sect_rumor >= 2", "risk_delta": -1, "note": "能察覺宗門告示的陷阱。" },
+      { "id": "high_greed_mark", "condition": "greed_mark >= 3", "risk_delta": 2, "note": "更容易被散修與師兄當成好用的人。" }
+    ]
+  },
+  "life_profile_pool": [
+    {
+      "id": "ordinary_youth",
+      "weight": 70,
+      "state_patch": { "body": 2, "silver": 3, "family_debt": 1, "village_bonds": 2 },
+      "opening_text": "你活到了十六歲。這在柳溪村不算稀奇，但也不算容易。"
+    },
+    {
+      "id": "debt_family",
+      "weight": 20,
+      "state_patch": { "body": 2, "silver": 1, "family_debt": 4, "village_bonds": 1 },
+      "opening_text": "你家欠了鎮上米鋪三兩七錢銀子。這個數字不大，卻足以改變一個少年的命。"
+    },
+    {
+      "id": "weak_body",
+      "weight": 8,
+      "state_patch": { "body": 1, "silver": 2, "family_debt": 2, "injury": 1 },
+      "opening_text": "你小時候發過一場高燒。郎中說你命硬，卻沒說你身子好。"
+    },
+    {
+      "id": "childhood_death_creek",
+      "weight": 2,
+      "terminal": true,
+      "ending_id": "death_childhood_creek",
+      "opening_text": "你三歲那年追著紙鳶跑到溪邊。大人找到你時，紙鳶在柳枝上，你在水草裡。"
+    }
+  ],
+  "world_intel_pool": [
+    { "id": "intel_family_fear", "text": "凡人的情報多半藏在家人的恐懼裡，不在修士的話術裡。" },
+    { "id": "intel_sweet_fog", "text": "山裡最香的草，通常不是給人吃的。" },
+    { "id": "intel_guarded_opportunity", "text": "真正的機緣旁邊，常常有真正能守住機緣的東西。" },
+    { "id": "intel_sect_threshold", "text": "宗門不用殺你。它只要把門檻修得夠高，凡人自己就會倒在路上。" },
+    { "id": "intel_almost_success", "text": "凡人最危險的時候，不是失敗，而是差一點成功。" },
+    { "id": "intel_cheap_chance", "text": "主動給凡人機會的人，常常不是看見你的天分，而是看見你的便宜。" },
+    { "id": "intel_other_death", "text": "有時候你活下來，不是因為你更聰明，而是因為有人比你早一步犯錯。" },
+    { "id": "intel_risk_transfer", "text": "看見別人死，可以讓你多活一次。等你習慣這件事，修仙界就離你不遠了。" }
+  ],
+  "epitaph_pool": [
+    { "id": "epi_child_creek", "text": "此地長眠著柳小春，享年三歲。\n他這一生離仙途最近的時候，\n是被村人說成『早登極樂』。" },
+    { "id": "epi_miasma_herb", "text": "此地長眠著李小年，享年十六。\n他終於採到了仙草。\n可惜仙草先採走了他的氣。" },
+    { "id": "epi_beast_herb", "text": "此地長眠著趙阿土，享年十八。\n他終於找到一株靈草。\n可惜那株草也早被別的東西找到了。" },
+    { "id": "epi_qingyun_steps", "text": "此地長眠著王狗蛋，享年十七。\n他死在第九十七級台階，\n離修仙夢想尚有三十九級之遙。" },
+    { "id": "epi_spirit_stone", "text": "此地長眠著劉三，享年十九。\n青雲宗終於收下了他。\n同日，靈石庫也終於補上了人手。" },
+    { "id": "epi_test_pill", "text": "此地長眠著周鐵柱，享年十七。\n他拜了一位散修為師。\n師父待他很好，\n每顆丹藥都讓他先吃。" },
+    { "id": "epi_bone_material", "text": "此地長眠著何小山，享年十六。\n他以為自己遇見了貴人。\n後來才知道，\n貴的是他的骨頭。" },
+    { "id": "epi_mundane_survival", "text": "此地長眠著吳平安，享年六十三。\n他一生錯過四次仙緣，\n避開五場死劫。\n村人說他沒有出息。\n他的墳前草長得最好。" }
+  ],
+  "event_lines": [
+    {
+      "line_id": "village_youth",
+      "name": "山村少年線",
+      "purpose": "建立玩家是普通凡人，受家庭、身體、銀錢、人情與資訊差限制。",
+      "events": [
+        {
+          "event_id": "CH1_VIL_001",
+          "title": "母親阻止進山",
+          "surface_text": "清晨，你把柴刀磨亮，準備進山。母親坐在灶前，沒有抬頭，只問：你是不是又聽誰說山裡有仙草？",
+          "truth_pool": [
+            { "id": "mother_knows_miasma_death", "danger": 1, "note": "母親知道王家孩子死於甜霧。" },
+            { "id": "mother_hides_family_debt", "danger": 1, "note": "母親不只怕山，也怕你被債逼走。" },
+            { "id": "mother_saw_cultivator_mark", "danger": 2, "note": "她看見村外散修曾在你家門口停留。" },
+            { "id": "ordinary_parental_fear", "danger": 0, "note": "她沒有額外情報，只是普通恐懼。" },
+            { "id": "neighbor_child_missing", "danger": 2, "note": "隔壁少年只找回一隻鞋。" }
+          ],
+          "visible_clues": ["草鞋被收進屋", "柴刀缺口被磨平", "灶邊有薑湯", "母親提到王家孩子時停住"],
+          "choices": [
+            { "choice_id": "listen", "label": "聽母親說完", "strategy": "打聽", "cost": { "time": 1 }, "effects": { "village_bonds": 1, "mountain_lore": 1 } },
+            { "choice_id": "lie_chop_wood", "label": "說自己只是砍柴", "strategy": "隱瞞", "cost": { "village_bonds": -1 }, "effects": { "greed_mark": 1 } },
+            { "choice_id": "sneak_out", "label": "趁她轉身偷偷出門", "strategy": "冒進", "cost": { "village_bonds": -1 }, "next_events": ["CH1_HERB_001", "CH1_HERB_002"] },
+            { "choice_id": "ask_neighbor_death", "label": "問王家孩子到底怎麼死的", "strategy": "追問", "cost": { "family_pressure": 1 }, "effects": { "mountain_lore": 1, "sect_rumor": 1 } }
+          ],
+          "death_foreshadowing": "母親阻止不是控制，而是她知道村裡已經死過人。",
+          "intel_ids": ["intel_family_fear"],
+          "foreshadow_tags": ["self_death", "witnessed_other_death"]
+        },
+        {
+          "event_id": "CH1_VIL_002",
+          "title": "老獵戶的獸足",
+          "surface_text": "老獵戶張老七把一團灰毛丟到你腳邊，說山上最近有東西下來過。",
+          "truth_pool": [
+            { "id": "beast_guarding_herb", "danger": 3, "note": "灰毛來自守草妖獸。" },
+            { "id": "ordinary_wolf_pack", "danger": 1, "note": "只是狼群靠近村子。" },
+            { "id": "cultivator_beast_pet", "danger": 3, "note": "獸不是野獸，而是修士放出的看守。" },
+            { "id": "hunter_exaggerates_for_silver", "danger": 0, "note": "獵戶誇大危險想換酒錢。" },
+            { "id": "wounded_beast_more_dangerous", "danger": 2, "note": "受傷的獸比普通妖獸更容易攻擊人。" }
+          ],
+          "visible_clues": ["灰毛根部有黑泥", "獵戶手背有新疤", "今日沒有帶獵犬", "曬肉架全收空"],
+          "choices": [
+            { "choice_id": "pay_for_lesson", "label": "花銅錢請他細說", "strategy": "付費情報", "cost": { "silver": -1 }, "effects": { "mountain_lore": 2 } },
+            { "choice_id": "work_for_lesson", "label": "幫他搬柴換情報", "strategy": "勞力換情報", "cost": { "body": -1 }, "effects": { "mountain_lore": 2 } },
+            { "choice_id": "hire_hunter", "label": "請他同行", "strategy": "求助", "cost": { "silver": -2, "village_bonds": -1 }, "effects": { "mountain_lore": 1 }, "risk_transfer_possible": true },
+            { "choice_id": "ignore_hunter", "label": "覺得老人膽小", "strategy": "省資源", "cost": {}, "effects": { "greed_mark": 1 } },
+            { "choice_id": "send_peer", "label": "讓同村少年先去問", "strategy": "轉嫁風險", "cost": {}, "effects": { "transferred_risk": true } }
+          ],
+          "death_result": { "id": "death_beast_ignored_clue", "epitaph_id": "epi_beast_herb", "intel_id": "intel_guarded_opportunity" },
+          "foreshadow_tags": ["self_death", "transferred_risk"]
+        }
+      ]
+    },
+    {
+      "line_id": "mountain_herb",
+      "name": "山中靈草線",
+      "purpose": "展示機緣不等於能拿；越像機緣越容易引來比玩家更強的危險。",
+      "events": [
+        {
+          "event_id": "CH1_HERB_001",
+          "title": "山腰發光草",
+          "surface_text": "你在山腰看見一株泛著微光的草，葉片邊緣有淡金色紋路。",
+          "truth_pool": [
+            { "id": "true_low_spirit_herb", "danger": 1, "reward": "minor_spirit_leaf", "note": "真低階靈草，但採摘仍可能傷身。" },
+            { "id": "miasma_companion", "danger": 3, "death_result_id": "death_miasma_smile", "note": "瘴氣伴生草。" },
+            { "id": "beast_bait", "danger": 4, "death_result_id": "death_beast_guard", "note": "妖獸誘食草。" },
+            { "id": "sect_field_leak", "danger": 2, "reward": "marked_herb", "note": "宗門藥田外洩。" },
+            { "id": "cultivator_tracking_mark", "danger": 3, "note": "修士設下的標記陷阱。" },
+            { "id": "freshly_taken_remnant", "danger": 2, "note": "有人剛採過，附近留下追蹤印記。" }
+          ],
+          "visible_clues": ["沒有蟲鳴", "土壤被翻過", "石縫裡有灰毛", "淡甜味山霧", "葉片太整齊", "樹幹有淺刻痕"],
+          "choices": [
+            { "choice_id": "pick_now", "label": "直接採下", "strategy": "冒進", "cost": {}, "risk_delta": 3 },
+            { "choice_id": "observe_far", "label": "躲遠觀察", "strategy": "觀察", "cost": { "time": 1, "caution_debt": 1 }, "reveal_clues": 1 },
+            { "choice_id": "check_tracks", "label": "檢查足跡", "strategy": "調查", "requires": { "mountain_lore": 1 }, "cost": { "time": 1 } },
+            { "choice_id": "bring_hunter", "label": "找獵戶同行", "strategy": "求助", "cost": { "silver": -2, "village_bonds": -1 }, "risk_delta": -1, "risk_transfer_possible": true },
+            { "choice_id": "mark_return", "label": "做記號回村", "strategy": "延後", "cost": { "time": 2, "caution_debt": 1 }, "possible_next": ["CH1_HERB_003"] },
+            { "choice_id": "leave", "label": "放棄離開", "strategy": "放棄", "cost": { "missed_opportunity": 1 }, "risk_delta": -2 }
+          ],
+          "death_results": [
+            { "id": "death_miasma_smile", "text": "你採下那株草時，以為指尖的冰冷是靈氣。回村路上，你開始笑。", "epitaph_id": "epi_miasma_herb", "intel_id": "intel_sweet_fog" },
+            { "id": "death_beast_guard", "text": "你伸手的瞬間，草後石縫動了一下。不是風。", "epitaph_id": "epi_beast_herb", "intel_id": "intel_guarded_opportunity" }
+          ],
+          "foreshadow_tags": ["self_death", "witnessed_other_death", "transferred_risk"]
+        },
+        {
+          "event_id": "CH1_HERB_002",
+          "title": "甜味山霧",
+          "surface_text": "山霧從林間漫出來，帶著一點甜味，像米糕蒸熟後揭開籠蓋的第一口氣。",
+          "truth_pool": [
+            { "id": "mild_mist", "danger": 0, "note": "普通霧氣，被村人傳得誇張。" },
+            { "id": "miasma", "danger": 4, "note": "真正毒瘴。" },
+            { "id": "beast_cover", "danger": 3, "note": "妖獸借霧遮身。" },
+            { "id": "cultivator_scent_marker", "danger": 2, "note": "聞入後會被符記追蹤。" },
+            { "id": "herb_pollen", "danger": 2, "note": "靈草粉塵讓凡人短暫幻覺。" }
+          ],
+          "visible_clues": ["霧甜得不自然", "鳥聲忽然停下", "地面有濕腳印", "遠處有人笑", "胸口微悶"],
+          "choices": [
+            { "choice_id": "inhale", "label": "深吸一口辨認味道", "strategy": "錯誤調查", "risk_delta": 4 },
+            { "choice_id": "cover_mouth", "label": "用濕布掩口", "strategy": "準備", "cost": { "water": -1, "cloth": -1 }, "risk_delta": -2 },
+            { "choice_id": "detour", "label": "繞路", "strategy": "延後", "cost": { "time": 1 }, "possible_next": ["CH1_VIL_002"] },
+            { "choice_id": "retreat", "label": "退回村中", "strategy": "放棄", "cost": { "caution_debt": 1, "missed_opportunity": 1 }, "risk_delta": -3 }
+          ],
+          "death_result": { "id": "death_sweet_fog", "epitaph_id": "epi_miasma_herb", "intel_id": "intel_sweet_fog" }
+        },
+        {
+          "event_id": "CH1_HERB_003",
+          "title": "回村只剩土坑",
+          "surface_text": "你做了記號，回村找人。再回山腰時，那株草不見了，只剩濕土坑與幾滴血。",
+          "truth_pool": [
+            { "id": "peer_took_it", "danger": 2, "note": "同村少年先採走。" },
+            { "id": "cultivator_reclaimed", "danger": 3, "note": "修士回收藥田外洩物。" },
+            { "id": "beast_moved_bait", "danger": 3, "note": "守草妖獸拖走誘餌。" },
+            { "id": "false_memory_mist", "danger": 1, "note": "玩家吸入霧氣後記錯位置。" },
+            { "id": "hunter_took_it", "danger": 1, "note": "同行者也不是完全可信。" }
+          ],
+          "choices": [
+            { "choice_id": "follow_blood", "label": "追血跡", "strategy": "冒進", "risk_delta": 3, "effects": { "witnessed_death": true } },
+            { "choice_id": "leave_now", "label": "立刻離開", "strategy": "放棄", "cost": { "missed_opportunity": 1 }, "risk_delta": -2 },
+            { "choice_id": "search_area", "label": "搜附近", "strategy": "調查", "cost": { "time": 1 }, "risk_delta": 1 },
+            { "choice_id": "blame_hunter", "label": "指責老獵戶動作太慢", "strategy": "遷怒", "cost": { "village_bonds": -2 } }
+          ],
+          "intel_ids": ["intel_other_death"]
+        }
+      ]
+    },
+    {
+      "line_id": "qingyun_recruitment",
+      "name": "青雲宗線",
+      "purpose": "展示宗門不是慈善機構；入門只是換一種死法。",
+      "events": [
+        {
+          "event_id": "CH1_QY_001",
+          "title": "招雜役告示",
+          "surface_text": "鎮口貼出青雲宗告示：青雲宗招雜役，年十六至十八者，可試。你注意到，告示上沒有寫工錢。",
+          "truth_pool": [
+            { "id": "real_recruit_dangerous", "danger": 2, "note": "真招雜役，但工作危險。" },
+            { "id": "spirit_stone_labor_shortage", "danger": 3, "note": "靈石搬運缺人。" },
+            { "id": "poison_field_replacement", "danger": 4, "note": "藥田差事缺替死鬼。" },
+            { "id": "local_elite_quota", "danger": 1, "note": "普通人只是陪跑。" },
+            { "id": "senior_bait_selection", "danger": 3, "note": "外門師兄私下挑探路炮灰。" },
+            { "id": "rare_broken_method", "danger": 1, "reward": "broken_breathing_method", "note": "極低機率取得殘缺吐納法。" }
+          ],
+          "visible_clues": ["告示沒有寫工錢", "回村的人很少", "富戶子弟提前住客棧", "只問身體不問家世", "瘸腿雜役掃血跡"],
+          "choices": [
+            { "choice_id": "pay_travel", "label": "花錢前往宗門", "strategy": "冒險投資", "cost": { "silver": -2 }, "next_events": ["CH1_QY_002"] },
+            { "choice_id": "ask_tavern", "label": "先去酒樓打聽", "strategy": "付費情報", "cost": { "silver": -1, "time": 1 }, "effects": { "sect_rumor": 2 } },
+            { "choice_id": "ask_returned_servant", "label": "找回村雜役問話", "strategy": "打聽", "cost": { "time": 1 }, "effects": { "sect_rumor": 2 } },
+            { "choice_id": "stay_village", "label": "留在村中", "strategy": "放棄", "cost": { "missed_opportunity": 1 }, "possible_endings": ["ending_mundane_survival"] },
+            { "choice_id": "sneak_queue", "label": "偷偷混進招募隊伍", "strategy": "投機", "risk_delta": 3 },
+            { "choice_id": "sell_property", "label": "賣掉家產準備路費", "strategy": "豪賭", "cost": { "family_debt": 2 }, "effects": { "silver": 3 } }
+          ],
+          "foreshadow_tags": ["self_death", "institution_consumes_weak"]
+        },
+        {
+          "event_id": "CH1_QY_002",
+          "title": "山門初選",
+          "surface_text": "招募弟子坐在長桌後，桌上放著一塊青色石頭。石頭亮了就記一筆，不亮就推到另一隊。",
+          "truth_pool": [
+            { "id": "ordinary_test", "danger": 1, "note": "普通靈根測試。" },
+            { "id": "pressure_test", "danger": 3, "note": "青石帶靈壓，凡人硬撐會傷身。" },
+            { "id": "servant_sorting", "danger": 2, "note": "測試只是分配耗材。" },
+            { "id": "quota_full", "danger": 1, "note": "名額早被富戶拿走。" },
+            { "id": "senior_marks_eager", "danger": 3, "note": "越想表現越容易被師兄記住。" }
+          ],
+          "choices": [
+            { "choice_id": "press_normally", "label": "老實按上去", "strategy": "照規矩", "risk_delta": 0 },
+            { "choice_id": "force_qi", "label": "用力運氣", "strategy": "硬撐", "risk_delta": 3, "effects": { "injury": 2 } },
+            { "choice_id": "observe_front", "label": "觀察前面的人", "strategy": "觀察", "cost": { "time": 1, "caution_debt": 1 }, "effects": { "sect_rumor": 1 } },
+            { "choice_id": "ask_work", "label": "問雜役要做什麼", "strategy": "問代價", "risk_delta": 1 },
+            { "choice_id": "say_can_endure", "label": "主動說自己能吃苦", "strategy": "自我標記", "effects": { "greed_mark": 2 }, "risk_delta": 2 }
+          ],
+          "death_result": { "id": "death_qingyun_steps_or_pressure", "epitaph_id": "epi_qingyun_steps", "intel_id": "intel_sect_threshold" },
+          "possible_endings": ["ending_servant_entry", "ending_meridian_damaged", "ending_rejected_alive"]
+        },
+        {
+          "event_id": "CH1_QY_003",
+          "title": "搬靈石",
+          "surface_text": "你被分到靈石庫外。地上的靈石用麻布包著，你剛碰到第一袋，就覺得掌心微微發熱。",
+          "truth_pool": [
+            { "id": "normal_labor", "danger": 1, "note": "普通搬運，但凡人仍會耗損。" },
+            { "id": "hot_spirit_stone", "danger": 4, "note": "靈石有靈壓殘留。" },
+            { "id": "poison_storage", "danger": 3, "note": "靈石袋沾過藥田毒粉。" },
+            { "id": "quota_survival_trial", "danger": 3, "note": "能撐過的人才被留下。" },
+            { "id": "senior_uses_player", "danger": 2, "note": "師兄要看誰願意聽話。" }
+          ],
+          "choices": [
+            { "choice_id": "carry_hard", "label": "硬搬", "strategy": "硬撐", "risk_delta": 3, "effects": { "injury": 2 } },
+            { "choice_id": "ask_gloves", "label": "要求手套", "strategy": "降低風險", "requires": { "sect_rumor": 1 }, "risk_delta": -1 },
+            { "choice_id": "carry_less", "label": "偷偷少搬", "strategy": "保身", "risk_delta": -1, "fail_risk": "caught_and_rejected" },
+            { "choice_id": "let_peer_touch", "label": "讓旁邊少年先碰", "strategy": "轉嫁風險", "effects": { "transferred_risk": true, "witnessed_death": true }, "risk_delta": -2 }
+          ],
+          "death_result": { "id": "death_spirit_stone_labor", "epitaph_id": "epi_spirit_stone", "intel_id": "intel_almost_success" },
+          "possible_endings": ["ending_servant_entry", "ending_meridian_damaged"]
+        }
+      ]
+    },
+    {
+      "line_id": "wandering_cultivator",
+      "name": "遊方散修線",
+      "purpose": "展示主動提供機會的人比妖獸更危險；機會常常是剝削的入口。",
+      "events": [
+        {
+          "event_id": "CH1_WC_001",
+          "title": "青袍散修入村",
+          "surface_text": "村口來了一名青袍散修。他看你的第一眼很久，像在看一件還沒估價的貨。",
+          "truth_pool": [
+            { "id": "fake_cultivator_scam", "danger": 1, "note": "騙盤纏的假修士。" },
+            { "id": "needs_test_subject", "danger": 4, "note": "缺試藥凡人。" },
+            { "id": "needs_alchemy_material", "danger": 5, "note": "尋找煉丹材料。" },
+            { "id": "fallen_good_person", "danger": 2, "reward": "broken_breathing_method", "note": "真正落魄好人，但自身難保。" },
+            { "id": "being_hunted", "danger": 4, "note": "被仇家追殺，帶誰誰倒楣。" },
+            { "id": "wants_jade", "danger": 3, "note": "看中的不是你，是祖傳玉佩。" }
+          ],
+          "visible_clues": ["太關心年齡體質與家人", "避談師門", "村長態度突然變好", "不喝井水", "鞋底有深泥", "看見玉佩時眼神變了"],
+          "choices": [
+            { "choice_id": "apprentice_now", "label": "立刻拜師", "strategy": "冒進", "risk_delta": 4 },
+            { "choice_id": "eavesdrop", "label": "偷聽他與村長談話", "strategy": "調查", "risk_delta": 1, "reveal_clues": 2 },
+            { "choice_id": "ask_sect", "label": "問他師門來歷", "strategy": "追問", "risk_delta": 1 },
+            { "choice_id": "observe_days", "label": "觀察幾天", "strategy": "觀察", "cost": { "time": 2, "caution_debt": 1 }, "reveal_clues": 1 },
+            { "choice_id": "ignore", "label": "不理他", "strategy": "放棄", "risk_delta": -2, "cost": { "missed_opportunity": 1 } },
+            { "choice_id": "show_jade", "label": "帶玉佩求鑑定", "strategy": "暴露資產", "effects": { "greed_mark": 3 }, "risk_delta": 3 }
+          ],
+          "death_results": [
+            { "id": "death_test_pill", "epitaph_id": "epi_test_pill", "intel_id": "intel_cheap_chance" },
+            { "id": "death_bone_material", "epitaph_id": "epi_bone_material", "intel_id": "intel_cheap_chance" }
+          ],
+          "possible_endings": ["ending_fake_method", "ending_broken_breathing_method", "ending_mundane_survival"]
+        },
+        {
+          "event_id": "CH1_WC_002",
+          "title": "第一顆丹藥",
+          "surface_text": "散修遞給你一顆丹藥：吃了它，你就不再只是凡人。丹藥在他掌心滾了一下，留下淡淡黑痕。",
+          "truth_pool": [
+            { "id": "poison_test", "danger": 4, "note": "試毒丹。" },
+            { "id": "failed_washing_pill", "danger": 3, "note": "失敗洗髓丹。" },
+            { "id": "real_minor_pill", "danger": 1, "reward": "brief_qi_sense", "note": "真低階丹，但凡人仍可能承受不住。" },
+            { "id": "tracking_pill", "danger": 2, "note": "吃下後被標記。" },
+            { "id": "ordinary_sugar_fake", "danger": 0, "note": "假丹藥，只是騙盤纏。" }
+          ],
+          "choices": [
+            { "choice_id": "eat_now", "label": "馬上吃", "strategy": "冒進", "risk_delta": 4 },
+            { "choice_id": "hide_pill", "label": "藏起來", "strategy": "拖延", "risk_delta": 1 },
+            { "choice_id": "feed_chicken", "label": "給雞吃", "strategy": "測試", "risk_delta": 0, "may_create_new_danger": true },
+            { "choice_id": "ask_doctor", "label": "送郎中看", "strategy": "求助", "cost": { "village_bonds": -1, "time": 1 }, "reveal_clues": 1 }
+          ],
+          "death_result": { "id": "death_test_pill", "epitaph_id": "epi_test_pill", "intel_id": "intel_cheap_chance" }
+        }
+      ]
+    }
+  ],
+  "chapter_endings": [
+    {
+      "ending_id": "ending_mundane_survival",
+      "type": "survive_without_cultivation",
+      "text": "你沒有採那株草，也沒有跟散修走，更沒有賣田上青雲宗。村人說你膽小，說你錯過了仙緣。你沒有修仙，但你活得比大多數想修仙的人久。",
+      "epitaph_id": "epi_mundane_survival"
+    },
+    {
+      "ending_id": "ending_meridian_damaged",
+      "type": "disqualified",
+      "text": "你摸到了靈石，也摸到了青雲宗的門檻。三日後，你被抬下山。郎中說，以後少挑重物。",
+      "flags": { "lost_cultivation_qualification": true }
+    },
+    {
+      "ending_id": "ending_servant_entry",
+      "type": "chapter2_entry",
+      "text": "青雲宗收下了你。不是外門，不是記名，也不是弟子。你得到一塊木牌，一套灰衣，還有一張不准下山的規矩紙。",
+      "flags": { "servant_entry": true }
+    },
+    {
+      "ending_id": "ending_broken_breathing_method",
+      "type": "rare_chapter2_entry",
+      "text": "落魄散修死在破廟外，最後把一本被火燒掉半邊的小冊子塞進你懷裡。冊子上寫著《小吐納》。",
+      "flags": { "broken_breathing_method": true, "injury": 1 }
+    },
+    {
+      "ending_id": "ending_other_died_for_you",
+      "type": "moral_foreshadow",
+      "text": "你沒有先進那片霧。王阿滿進去了。霧裡先是傳出他的笑聲，接著是咳嗽，最後什麼都沒有。",
+      "flags": { "witnessed_death": true, "transferred_risk": true },
+      "intel_id": "intel_risk_transfer"
+    }
+  ]
+}
