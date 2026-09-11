@@ -1175,7 +1175,7 @@
     ], '第四章真正的成長不是更能打，而是你開始有權分配風險。第五章會問：既然總要有人先去，為什麼不能是別人？', {
       ageAtEnd: 22,
       closestMoment: '第一次有權安排三名新人誰探路、誰守夜、誰斷後',
-      continueTo: '__dev_chapter_5',
+      continueTo: 'ch5_entry_deputy',
       continueLabel: '第五章：代價停在你手裡'
     }),
 
@@ -1186,7 +1186,7 @@
     ], '謹慎可以是合理勝利。它保留退路，代價是較少資源、較少深層關係與較窄的上升入口。', {
       ageAtEnd: 49,
       closestMoment: '在白石仙城完整辦完一次外務而沒有留下大債',
-      continueTo: '__dev_chapter_5',
+      continueTo: 'ch5_entry_clean',
       continueLabel: '第五章：你仍然要帶新人'
     }),
 
@@ -1197,7 +1197,7 @@
     ], '通緝不是單純 Debuff。它提高官方生活成本，也會打開黑市、逃亡、灰色商隊路線；長期會改變玩家願意使用的手段。', {
       ageAtEnd: 31,
       closestMoment: '活著看見自己的名字從官方記錄裡失效',
-      continueTo: '__dev_chapter_5',
+      continueTo: 'ch5_entry_fugitive',
       continueLabel: '第五章：沒有乾淨身份的人怎麼帶人'
     }),
 
@@ -1208,7 +1208,7 @@
     ], '多靠山不是單純疊加安全。每增加一條關係，也增加衝突義務、情報暴露與被迫選邊的可能。', {
       ageAtEnd: 36,
       closestMoment: '同時被青雲宗與顧家視為「可以用的人」',
-      continueTo: '__dev_chapter_5',
+      continueTo: 'ch5_entry_gu',
       continueLabel: '第五章：現在你也有下面的人'
     })
   };

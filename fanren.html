@@ -626,9 +626,10 @@
   <script src="data/runtime/chapter2_scenes.js"></script>
   <script src="data/runtime/chapter3_scenes.js"></script>
   <script src="data/runtime/chapter4_scenes.js"></script>
+  <script src="data/runtime/chapter5_scenes.js"></script>
   <script>
     (() => {
-      const INITIAL = Object.freeze({ coins: 3, qi: 80, deaths: 0, age: 17, merit: 0, pollution: 0, intel: 0, appraisal: 0, trust: 50, betrayal: 15, spiritStone: 3, blackCredit: 0, karma: 0, wanted: 0, factionSect: 0, factionGu: 0, factionBlack: 0, factionGov: 0, closestMoment: '尚未摸到仙途' });
+      const INITIAL = Object.freeze({ coins: 3, qi: 80, deaths: 0, age: 17, merit: 0, pollution: 0, intel: 0, appraisal: 0, trust: 50, betrayal: 15, spiritStone: 3, blackCredit: 0, karma: 0, wanted: 0, factionSect: 0, factionGu: 0, factionBlack: 0, factionGov: 0, riskShift: 0, responsibility: 0, exitWill: 0, closestMoment: '尚未摸到仙途' });
 
       const SCENES = {
         intro: {
@@ -1583,6 +1584,7 @@
       Object.assign(SCENES, window.CHAPTER2_SCENES || {});
       Object.assign(SCENES, window.CHAPTER3_SCENES || {});
       Object.assign(SCENES, window.CHAPTER4_SCENES || {});
+      Object.assign(SCENES, window.CHAPTER5_SCENES || {});
 
       const queryParams = new URLSearchParams(window.location.search);
       const isDevMode = queryParams.get('dev') === '1';
@@ -1592,7 +1594,7 @@
         2: 'ch2_contract_entry',
         3: 'ch3_call_entry',
         4: 'ch4_descent_entry',
-        5: '__dev_chapter_5'
+        5: 'ch5_lead_entry'
       };
 
       Object.assign(SCENES, {
@@ -1620,13 +1622,13 @@
         },
         __dev_chapter_5: {
           bookChapter: 5,
-          chapter: '第五章・工程佔位',
-          title: '我還算人嗎？',
+          chapter: '第五章・舊工程入口',
+          title: '選擇修仙，還是不修仙',
           type: 'dev',
           paragraphs: [
-            '第五章入口已在工程版開放。',
-            '本章承接「讓別人死」與弒龍者終成惡龍：玩家終於能把風險往下推，但必須決定自己還要不要繼續往上爬。',
-            '目前先保留章節入口與主題規格，正文與互動場景尚待接入。'
+            '第五章正式互動已接入 `ch5_lead_entry`。',
+            '目前可完整走新人分工、北三洞、錯誤情報、詛咒法器、黑市追殺、高危名冊、祖峰真相、登仙台與多結局。',
+            '此舊佔位場景只保留相容用途，不再作為章節入口。'
           ]
         }
       });
@@ -1693,6 +1695,9 @@
         state.factionGu = clamp(state.factionGu + (choice.factionGuDelta || 0), -100, 100);
         state.factionBlack = clamp(state.factionBlack + (choice.factionBlackDelta || 0), -100, 100);
         state.factionGov = clamp(state.factionGov + (choice.factionGovDelta || 0), -100, 100);
+        state.riskShift = clamp(state.riskShift + (choice.riskShiftDelta || 0), 0, 100);
+        state.responsibility = clamp(state.responsibility + (choice.responsibilityDelta || 0), 0, 100);
+        state.exitWill = clamp(state.exitWill + (choice.exitWillDelta || 0), 0, 100);
         if (choice.moment) state.closestMoment = choice.moment;
       }
 
@@ -1728,6 +1733,18 @@
             <span class="stat">通緝 <strong>${state.wanted}</strong></span>
             <span class="stat">情報 <strong>${state.intel}</strong></span>
             <span class="stat">傾向 <strong>${factionLabel}</strong></span>
+            <span class="stat">死數 <strong>${state.deaths}</strong></span>
+          `;
+          return;
+        }
+        if (bookChapter === 5) {
+          statusBar.innerHTML = `
+            <span class="stat">氣血 <strong>${state.qi}</strong></span>
+            <span class="stat">靈石 <strong>${state.spiritStone}</strong></span>
+            <span class="stat">情報 <strong>${state.intel}</strong></span>
+            <span class="stat">轉嫁 <strong>${state.riskShift}</strong></span>
+            <span class="stat">承擔 <strong>${state.responsibility}</strong></span>
+            <span class="stat">退出意志 <strong>${state.exitWill}</strong></span>
             <span class="stat">死數 <strong>${state.deaths}</strong></span>
           `;
           return;
@@ -1945,6 +1962,9 @@
               if (choice.factionGuDelta) cost.push(`顧家 ${choice.factionGuDelta > 0 ? '+' : ''}${choice.factionGuDelta}`);
               if (choice.factionBlackDelta) cost.push(`黑市 ${choice.factionBlackDelta > 0 ? '+' : ''}${choice.factionBlackDelta}`);
               if (choice.factionGovDelta) cost.push(`王府 ${choice.factionGovDelta > 0 ? '+' : ''}${choice.factionGovDelta}`);
+              if (choice.riskShiftDelta) cost.push(`轉嫁 ${choice.riskShiftDelta > 0 ? '+' : ''}${choice.riskShiftDelta}`);
+              if (choice.responsibilityDelta) cost.push(`承擔 ${choice.responsibilityDelta > 0 ? '+' : ''}${choice.responsibilityDelta}`);
+              if (choice.exitWillDelta) cost.push(`退出意志 ${choice.exitWillDelta > 0 ? '+' : ''}${choice.exitWillDelta}`);
               if (choice.risk) cost.push(`風險：${choice.risk}`);
               const available = meetsRequirements(choice);
               if (!available) {
