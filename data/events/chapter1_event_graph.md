@@ -121,7 +121,7 @@ WANDERING_CULTIVATOR
 ```text
 CH1_EXIT
   ├─ DEATH_SELF              # 第一章主軸：自己死
-  ├─ WITNESSED_OTHER_DEATH   # 第三章伏筆：看別人死
+  ├─ WITNESSED_OTHER_DEATH   # 第三章伏筆：別人的死會留下風險情報，但不等於固定答案
   ├─ TRANSFERRED_RISK        # 第五章伏筆：讓別人死
   ├─ MUNDANE_SURVIVAL        # 苟活凡人
   ├─ DAMAGED_MERIDIAN        # 失去資格
