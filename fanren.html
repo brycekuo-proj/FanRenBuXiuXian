@@ -399,7 +399,9 @@
     }
 
     @media (hover: hover) and (pointer: fine) {
-      .choice-btn:hover {
+      .choice-btn:disabled { opacity: .48; cursor: not-allowed; filter: grayscale(.35); }
+
+    .choice-btn:hover {
         background: linear-gradient(135deg, rgba(50,33,10,.96), rgba(60,40,14,.96));
         border-color: rgba(200,140,50,.55);
         border-left-color: rgba(220,160,60,.9);
@@ -622,9 +624,10 @@
   </main>
 
   <script src="data/runtime/chapter2_scenes.js"></script>
+  <script src="data/runtime/chapter3_scenes.js"></script>
   <script>
     (() => {
-      const INITIAL = Object.freeze({ coins: 3, qi: 80, deaths: 0, age: 17, closestMoment: '尚未摸到仙途' });
+      const INITIAL = Object.freeze({ coins: 3, qi: 80, deaths: 0, age: 17, merit: 0, pollution: 0, intel: 0, appraisal: 0, trust: 50, betrayal: 15, closestMoment: '尚未摸到仙途' });
 
       const SCENES = {
         intro: {
@@ -1577,6 +1580,7 @@
       };
 
       Object.assign(SCENES, window.CHAPTER2_SCENES || {});
+      Object.assign(SCENES, window.CHAPTER3_SCENES || {});
 
       const queryParams = new URLSearchParams(window.location.search);
       const isDevMode = queryParams.get('dev') === '1';
@@ -1584,7 +1588,7 @@
       const DEV_CHAPTER_ENTRY = {
         1: 'intro',
         2: 'ch2_contract_entry',
-        3: '__dev_chapter_3',
+        3: 'ch3_call_entry',
         4: '__dev_chapter_4',
         5: '__dev_chapter_5'
       };
@@ -1598,7 +1602,7 @@
           paragraphs: [
             '第三章入口已在工程版開放。',
             '本章正式定位為「藥谷秘境，機緣皆是殺局」：核心仍是「看別人死」——別人的死變成你的情報與安全距離；真機緣與餌難分，觀察、延遲、交易、準備比單純拿／不拿更重要。',
-            '目前正文與互動場景尚未接入；這不是章節鎖定，而是工程佔位。'
+            '第三章互動 runtime 已接入；此舊佔位場景不再作為章節入口。'
           ]
         },
         __dev_chapter_4: {
@@ -1673,6 +1677,12 @@
         if (!choice) return;
         state.coins = clamp(state.coins + (choice.coinDelta || 0), 0, 99);
         state.qi = clamp(state.qi + (choice.qiDelta || 0), 0, 120);
+        state.merit = clamp(state.merit + (choice.meritDelta || 0), 0, 999);
+        state.pollution = clamp(state.pollution + (choice.pollutionDelta || 0), 0, 100);
+        state.intel = clamp(state.intel + (choice.intelDelta || 0), 0, 100);
+        state.appraisal = clamp(state.appraisal + (choice.appraisalDelta || 0), 0, 100);
+        state.trust = clamp(state.trust + (choice.trustDelta || 0), 0, 100);
+        state.betrayal = clamp(state.betrayal + (choice.betrayalDelta || 0), 0, 100);
         if (choice.moment) state.closestMoment = choice.moment;
       }
 
@@ -1683,6 +1693,17 @@
         const chapterName = chapterNames[bookChapter - 1];
         if (gameTitleBar) gameTitleBar.textContent = `凡人不修仙：第${chapterName}章${isDevMode ? '・工程版' : ''}`;
         document.title = `凡人不修仙｜第${chapterName}章${isDevMode ? '・工程版' : ''}`;
+        if (bookChapter === 3) {
+          statusBar.innerHTML = `
+            <span class="stat">氣血 <strong>${state.qi}</strong></span>
+            <span class="stat">貢獻 <strong>${state.merit}</strong></span>
+            <span class="stat">污染 <strong>${state.pollution}</strong></span>
+            <span class="stat">情報 <strong>${state.intel}</strong></span>
+            <span class="stat">鑑別 <strong>${state.appraisal}</strong></span>
+            <span class="stat">死數 <strong>${state.deaths}</strong></span>
+          `;
+          return;
+        }
         statusBar.innerHTML = `
           <span class="stat">銅錢 <strong>${state.coins}</strong></span>
           <span class="stat">氣血 <strong>${state.qi}</strong></span>
@@ -1713,8 +1734,25 @@
         return normalized[normalized.length - 1].next;
       }
 
+      function getStateValue(stat) {
+        return Number(state && state[stat]) || 0;
+      }
+
+      function meetsRequirements(choice) {
+        const requires = choice && choice.requires;
+        if (!requires || typeof requires !== 'object') return true;
+        return Object.entries(requires).every(([stat, threshold]) => getStateValue(stat) >= Number(threshold || 0));
+      }
+
       function resolveChoiceNext(choice) {
         if (!choice) return null;
+        if (Array.isArray(choice.nextByState)) {
+          for (const rule of choice.nextByState) {
+            const value = getStateValue(rule.stat);
+            if (typeof rule.gte === 'number' && value >= rule.gte) return rule.next;
+            if (typeof rule.lte === 'number' && value <= rule.lte) return rule.next;
+          }
+        }
         if (Array.isArray(choice.nextPool) && choice.nextPool.length) return pickWeighted(choice.nextPool);
         return choice.next || null;
       }
@@ -1862,8 +1900,16 @@
               const cost = [];
               if (choice.coinDelta) cost.push(`銅錢 ${choice.coinDelta > 0 ? '+' : ''}${choice.coinDelta}`);
               if (choice.qiDelta) cost.push(`氣血 ${choice.qiDelta > 0 ? '+' : ''}${choice.qiDelta}`);
+              if (choice.meritDelta) cost.push(`貢獻 ${choice.meritDelta > 0 ? '+' : ''}${choice.meritDelta}`);
+              if (choice.pollutionDelta) cost.push(`污染 ${choice.pollutionDelta > 0 ? '+' : ''}${choice.pollutionDelta}`);
+              if (choice.intelDelta) cost.push(`情報 ${choice.intelDelta > 0 ? '+' : ''}${choice.intelDelta}`);
+              if (choice.appraisalDelta) cost.push(`鑑別 ${choice.appraisalDelta > 0 ? '+' : ''}${choice.appraisalDelta}`);
+              if (choice.trustDelta) cost.push(`信任 ${choice.trustDelta > 0 ? '+' : ''}${choice.trustDelta}`);
+              if (choice.betrayalDelta) cost.push(`背叛 ${choice.betrayalDelta > 0 ? '+' : ''}${choice.betrayalDelta}`);
               if (choice.risk) cost.push(`風險：${choice.risk}`);
-              return `<button class="choice-btn" type="button" data-choice-index="${idx}">
+              const available = meetsRequirements(choice);
+              if (!available) cost.push(choice.requireText || '條件不足');
+              return `<button class="choice-btn" type="button" data-choice-index="${idx}" ${available ? '' : 'disabled aria-disabled="true"'}>
                 <span class="choice-number">${idx + 1}.</span>${escapeHtml(choice.text)}
                 ${cost.length ? `<span class="choice-cost ${choice.risk ? 'choice-risk' : ''}">${escapeHtml(cost.join('｜'))}</span>` : ''}
               </button>`;
@@ -1876,7 +1922,7 @@
         content.querySelectorAll('[data-choice-index]').forEach(button => {
           button.addEventListener('click', () => {
             const idx = Number(button.getAttribute('data-choice-index'));
-            if (!Number.isFinite(idx) || !choices[idx]) return;
+            if (!Number.isFinite(idx) || !choices[idx] || !meetsRequirements(choices[idx])) return;
             choose(choices[idx]);
           });
         });
@@ -1935,7 +1981,7 @@
         `;
         content.scrollTop = 0;
         content.querySelector('#restartBtn').addEventListener('click', restart);
-        content.querySelector('#chapterBtn').addEventListener('click', () => go('start_choice'));
+        content.querySelector('#chapterBtn').addEventListener('click', () => go(isDevMode && DEV_CHAPTER_ENTRY[requestedChapter] ? DEV_CHAPTER_ENTRY[requestedChapter] : 'start_choice'));
       }
 
       function renderSurvival(scene) {
@@ -1961,7 +2007,7 @@
         const continueBtn = content.querySelector('#continueBtn');
         if (continueBtn && scene.continueTo) continueBtn.addEventListener('click', () => go(scene.continueTo));
         content.querySelector('#restartBtn').addEventListener('click', restart);
-        content.querySelector('#chapterBtn').addEventListener('click', () => go('start_choice'));
+        content.querySelector('#chapterBtn').addEventListener('click', () => go(isDevMode && DEV_CHAPTER_ENTRY[requestedChapter] ? DEV_CHAPTER_ENTRY[requestedChapter] : 'start_choice'));
       }
 
       function renderIntel(intel) {
@@ -1986,7 +2032,9 @@
       function restart() {
         clearTimers();
         state = { ...INITIAL, deaths: state.deaths };
-        sceneKey = 'intro';
+        sceneKey = isDevMode && DEV_CHAPTER_ENTRY[requestedChapter]
+          ? DEV_CHAPTER_ENTRY[requestedChapter]
+          : 'intro';
         renderScene();
       }
 

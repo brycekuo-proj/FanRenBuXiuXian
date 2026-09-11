@@ -1138,6 +1138,8 @@ window.CHAPTER2_SCENES = {
     chapter: '第二章・記名弟子',
     title: '第一次當師兄',
     type: 'survival',
+    continueTo: 'ch3_call_entry',
+    continueLabel: '收到藥谷徵召',
     ageAtEnd: 20,
     closestMoment: '成為青雲宗外門記名弟子',
     intel: '你第一次有能力讓別人少承擔一點風險。這不是終點，只是第五章那個問題第一次有了反方向的答案。',
@@ -1155,6 +1157,8 @@ window.CHAPTER2_SCENES = {
     chapter: '第二章・記名弟子',
     title: '日落前',
     type: 'survival',
+    continueTo: 'ch3_call_entry',
+    continueLabel: '收到藥谷徵召',
     ageAtEnd: 21,
     closestMoment: '第一次負責帶一隊雜役',
     intel: '世界會獎勵把壓力往下傳的人。真正可怕的不是你變壞，而是你發現這樣真的比較有效。',
@@ -1266,7 +1270,7 @@ window.CHAPTER2_SCENES = {
     type: 'survival',
     ageAtEnd: 21,
     closestMoment: '帶著宗門三年經驗離開青雲山',
-    intel: '第二章結束：你已知道仙門裡的人怎麼把風險往下傳。下一站，青石坊市會讓你看見沒有人替你發飯時，大家又怎麼吃彼此。',
+    intel: '這是一條離開宗門的存活人生。正式第三章藥谷秘境只承接仍留在青雲宗、已取得記名／外門資格的路線。',
     paragraphs: [
       '你背著包袱走出山門。',
       '遠處青石坊市的燈一盞盞亮起。有人說那裡比宗門自由，功法有錢就能買，消息也比山上靈通。',
@@ -1275,7 +1279,7 @@ window.CHAPTER2_SCENES = {
       '你問哪裡好。',
       '他把碗裡最後一口粥喝掉。',
       '「騙你的人至少先跟你談價錢。」',
-      '你開始學會，看別人先死。'
+      '這條人生往青石坊市繼續，但你不會被列進藥谷徵召名冊。'
     ]
   }
 };
