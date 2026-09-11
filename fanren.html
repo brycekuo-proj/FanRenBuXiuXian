@@ -625,9 +625,10 @@
 
   <script src="data/runtime/chapter2_scenes.js"></script>
   <script src="data/runtime/chapter3_scenes.js"></script>
+  <script src="data/runtime/chapter4_scenes.js"></script>
   <script>
     (() => {
-      const INITIAL = Object.freeze({ coins: 3, qi: 80, deaths: 0, age: 17, merit: 0, pollution: 0, intel: 0, appraisal: 0, trust: 50, betrayal: 15, closestMoment: '尚未摸到仙途' });
+      const INITIAL = Object.freeze({ coins: 3, qi: 80, deaths: 0, age: 17, merit: 0, pollution: 0, intel: 0, appraisal: 0, trust: 50, betrayal: 15, spiritStone: 3, blackCredit: 0, karma: 0, wanted: 0, factionSect: 0, factionGu: 0, factionBlack: 0, factionGov: 0, closestMoment: '尚未摸到仙途' });
 
       const SCENES = {
         intro: {
@@ -1581,6 +1582,7 @@
 
       Object.assign(SCENES, window.CHAPTER2_SCENES || {});
       Object.assign(SCENES, window.CHAPTER3_SCENES || {});
+      Object.assign(SCENES, window.CHAPTER4_SCENES || {});
 
       const queryParams = new URLSearchParams(window.location.search);
       const isDevMode = queryParams.get('dev') === '1';
@@ -1589,7 +1591,7 @@
         1: 'intro',
         2: 'ch2_contract_entry',
         3: 'ch3_call_entry',
-        4: '__dev_chapter_4',
+        4: 'ch4_descent_entry',
         5: '__dev_chapter_5'
       };
 
@@ -1607,13 +1609,13 @@
         },
         __dev_chapter_4: {
           bookChapter: 4,
-          chapter: '第四章・工程佔位',
-          title: '打了小的，來了老的',
+          chapter: '第四章・舊工程入口',
+          title: '仙城人禍・凡人比妖更毒',
           type: 'dev',
           paragraphs: [
-            '第四章入口已在工程版開放。',
-            '本章核心是套娃追殺：打了小的，來了老的；但今天的小的就是主角。',
-            '玩家開始擁有籌碼，也因此被更大的宗門、家族與利益鏈盯上。正文與互動場景尚待接入。'
+            '第四章正式互動已接入 `ch4_descent_entry`。',
+            '目前完整可走下山、仙城、拍賣、疫村與城破主流程；靈石、黑市信用、因果、通緝與陣營狀態均已啟用。',
+            '此舊佔位場景保留作相容用途，不再作為章節入口。'
           ]
         },
         __dev_chapter_5: {
@@ -1683,6 +1685,14 @@
         state.appraisal = clamp(state.appraisal + (choice.appraisalDelta || 0), 0, 100);
         state.trust = clamp(state.trust + (choice.trustDelta || 0), 0, 100);
         state.betrayal = clamp(state.betrayal + (choice.betrayalDelta || 0), 0, 100);
+        state.spiritStone = clamp(state.spiritStone + (choice.spiritStoneDelta || 0), 0, 999);
+        state.blackCredit = clamp(state.blackCredit + (choice.blackCreditDelta || 0), -20, 100);
+        state.karma = clamp(state.karma + Math.abs(choice.karmaDelta || 0), 0, 100);
+        state.wanted = clamp(state.wanted + (choice.wantedDelta || 0), 0, 100);
+        state.factionSect = clamp(state.factionSect + (choice.factionSectDelta || 0), -100, 100);
+        state.factionGu = clamp(state.factionGu + (choice.factionGuDelta || 0), -100, 100);
+        state.factionBlack = clamp(state.factionBlack + (choice.factionBlackDelta || 0), -100, 100);
+        state.factionGov = clamp(state.factionGov + (choice.factionGovDelta || 0), -100, 100);
         if (choice.moment) state.closestMoment = choice.moment;
       }
 
@@ -1700,6 +1710,24 @@
             <span class="stat">污染 <strong>${state.pollution}</strong></span>
             <span class="stat">情報 <strong>${state.intel}</strong></span>
             <span class="stat">鑑別 <strong>${state.appraisal}</strong></span>
+            <span class="stat">死數 <strong>${state.deaths}</strong></span>
+          `;
+          return;
+        }
+        if (bookChapter === 4) {
+          const factionEntries = [
+            ['青雲', state.factionSect], ['顧家', state.factionGu], ['黑市', state.factionBlack], ['王府', state.factionGov]
+          ];
+          factionEntries.sort((a, b) => b[1] - a[1]);
+          const factionLabel = factionEntries[0][1] > 0 ? factionEntries[0][0] : '未定';
+          statusBar.innerHTML = `
+            <span class="stat">氣血 <strong>${state.qi}</strong></span>
+            <span class="stat">靈石 <strong>${state.spiritStone}</strong></span>
+            <span class="stat">黑信 <strong>${state.blackCredit}</strong></span>
+            <span class="stat">因果 <strong>${state.karma}</strong></span>
+            <span class="stat">通緝 <strong>${state.wanted}</strong></span>
+            <span class="stat">情報 <strong>${state.intel}</strong></span>
+            <span class="stat">傾向 <strong>${factionLabel}</strong></span>
             <span class="stat">死數 <strong>${state.deaths}</strong></span>
           `;
           return;
@@ -1739,7 +1767,10 @@
       }
 
       function meetsRequirements(choice) {
-        const requires = choice && choice.requires;
+        if (!choice) return false;
+        const spiritStoneDelta = Number(choice.spiritStoneDelta) || 0;
+        if (spiritStoneDelta < 0 && state.spiritStone < Math.abs(spiritStoneDelta)) return false;
+        const requires = choice.requires;
         if (!requires || typeof requires !== 'object') return true;
         return Object.entries(requires).every(([stat, threshold]) => getStateValue(stat) >= Number(threshold || 0));
       }
@@ -1906,9 +1937,21 @@
               if (choice.appraisalDelta) cost.push(`鑑別 ${choice.appraisalDelta > 0 ? '+' : ''}${choice.appraisalDelta}`);
               if (choice.trustDelta) cost.push(`信任 ${choice.trustDelta > 0 ? '+' : ''}${choice.trustDelta}`);
               if (choice.betrayalDelta) cost.push(`背叛 ${choice.betrayalDelta > 0 ? '+' : ''}${choice.betrayalDelta}`);
+              if (choice.spiritStoneDelta) cost.push(`靈石 ${choice.spiritStoneDelta > 0 ? '+' : ''}${choice.spiritStoneDelta}`);
+              if (choice.blackCreditDelta) cost.push(`黑信 ${choice.blackCreditDelta > 0 ? '+' : ''}${choice.blackCreditDelta}`);
+              if (choice.karmaDelta) cost.push(`因果 +${Math.abs(choice.karmaDelta)}`);
+              if (choice.wantedDelta) cost.push(`通緝 ${choice.wantedDelta > 0 ? '+' : ''}${choice.wantedDelta}`);
+              if (choice.factionSectDelta) cost.push(`青雲 ${choice.factionSectDelta > 0 ? '+' : ''}${choice.factionSectDelta}`);
+              if (choice.factionGuDelta) cost.push(`顧家 ${choice.factionGuDelta > 0 ? '+' : ''}${choice.factionGuDelta}`);
+              if (choice.factionBlackDelta) cost.push(`黑市 ${choice.factionBlackDelta > 0 ? '+' : ''}${choice.factionBlackDelta}`);
+              if (choice.factionGovDelta) cost.push(`王府 ${choice.factionGovDelta > 0 ? '+' : ''}${choice.factionGovDelta}`);
               if (choice.risk) cost.push(`風險：${choice.risk}`);
               const available = meetsRequirements(choice);
-              if (!available) cost.push(choice.requireText || '條件不足');
+              if (!available) {
+                const stoneCost = Number(choice.spiritStoneDelta) || 0;
+                const lacksStone = stoneCost < 0 && state.spiritStone < Math.abs(stoneCost);
+                cost.push(choice.requireText || (lacksStone ? '靈石不足' : '條件不足'));
+              }
               return `<button class="choice-btn" type="button" data-choice-index="${idx}" ${available ? '' : 'disabled aria-disabled="true"'}>
                 <span class="choice-number">${idx + 1}.</span>${escapeHtml(choice.text)}
                 ${cost.length ? `<span class="choice-cost ${choice.risk ? 'choice-risk' : ''}">${escapeHtml(cost.join('｜'))}</span>` : ''}

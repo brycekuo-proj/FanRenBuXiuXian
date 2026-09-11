@@ -1077,41 +1077,41 @@
       '當晚內廊坍塌，留下的人有人失蹤。',
       '你保住藥谷貢獻和完整身體。',
       '這一世很容易讓人相信「撤退就是答案」。下一世不一定。'
-    ], { type: 'survival', ageAtEnd: 51, closestMoment: '在秘境門口選擇撤退', intel: '正確判斷不是由結果倒推。撤退這次救你，下一次也可能只讓你錯過真機緣。' }),
+    ], { type: 'survival', ageAtEnd: 51, closestMoment: '在秘境門口選擇撤退', intel: '正確判斷不是由結果倒推。撤退這次救你，下一次也可能只讓你錯過真機緣。', continueTo: 'ch4_descent_entry', continueLabel: '第四章：下山去白石仙城' }),
 
     ch3_end_retreat_cost: S('活著出谷', '秋後清算', [
       '秘境最後沒有大規模坍塌。',
       '宗門把留隊探查者記功，提前退出者沒有被罰。',
       '只是下一輪高收益差事名單裡，你排到後面。',
       '理由很合理：風險承受能力較低。'
-    ], { type: 'survival', ageAtEnd: 46, closestMoment: '活著退出藥谷秘境', intel: '逃避高風險任務也可能有制度成本。不貪不是免費安全鍵。' }),
+    ], { type: 'survival', ageAtEnd: 46, closestMoment: '活著退出藥谷秘境', intel: '逃避高風險任務也可能有制度成本。不貪不是免費安全鍵。', continueTo: 'ch4_descent_entry', continueLabel: '第四章：下山去白石仙城' }),
 
     ch3_end_info: S('活著出谷', '把正確情報帶出來', [
       '你一件最強古物都沒帶。',
       '卻帶回路線、污染樣本、功法拓印、殘魂對話與隊伍行為記錄。',
       '幾個月後，你被調去藥堂與檔房之間做專門記錄。',
       '你沒有靠一顆丹翻十倍。你只是終於不用站在最前面替別人踩未知。'
-    ], { type: 'survival', ageAtEnd: 63, closestMoment: '活著帶出一套能被驗證的秘境情報', intel: '第三章的高價值勝利之一：別人的死提供情報，但你帶出去的是判斷方法，不是固定攻略。' }),
+    ], { type: 'survival', ageAtEnd: 63, closestMoment: '活著帶出一套能被驗證的秘境情報', intel: '第三章的高價值勝利之一：別人的死提供情報，但你帶出去的是判斷方法，不是固定攻略。', continueTo: 'ch4_descent_entry', continueLabel: '第四章：下山去白石仙城' }),
 
     ch3_end_growth: S('活著出谷', '真改命', [
       '你把貢獻換成完整養脈法與穩定修行資源。',
       '一年後進一層，三年後再進一層。',
       '不是天才速度。對你來說卻第一次是一條能走的路。',
       '機緣真的會給你東西。所以你以後才還會伸手。'
-    ], { type: 'survival', ageAtEnd: 58, closestMoment: '把秘境收益換成真正能走的修行路', intel: '「機緣皆是殺局」不等於機緣全是假的。真機緣必須存在，誘惑才成立。' }),
+    ], { type: 'survival', ageAtEnd: 58, closestMoment: '把秘境收益換成真正能走的修行路', intel: '「機緣皆是殺局」不等於機緣全是假的。真機緣必須存在，誘惑才成立。', continueTo: 'ch4_descent_entry', continueLabel: '第四章：下山去白石仙城' }),
 
     ch3_end_relic: S('活著出谷', '真的保住收益', [
       '你把古物賣掉，還清欠帳，換到幾年都攢不到的資源。',
       '沒有詛咒追來，也沒有失主找門。',
       '這次冒險真的值得。',
       '正因如此，你知道自己以後還會再冒一次。'
-    ], { type: 'survival', ageAtEnd: 55, closestMoment: '從秘境帶出一件真正值錢的古物', intel: '冒險有時真的會成功。不要把成功背成保證，也不要把危險背成拒絕所有機緣。' }),
+    ], { type: 'survival', ageAtEnd: 55, closestMoment: '從秘境帶出一件真正值錢的古物', intel: '冒險有時真的會成功。不要把成功背成保證，也不要把危險背成拒絕所有機緣。', continueTo: 'ch4_descent_entry', continueLabel: '第四章：下山去白石仙城' }),
 
     ch3_end_polluted: S('活著出谷', '你帶出來的東西也帶著你', [
       '你沒有立刻惡化。',
       '只是偶爾能比別人更早聞到靈藥異常，代價是每三月要去醫堂檢查。',
       '你得到一種以前沒有的能力，也失去部分核心區通行資格。',
       '機緣沒有單純加在你身上。它把你改成另一種人。'
-    ], { type: 'survival', ageAtEnd: 37, closestMoment: '帶著低度機緣污染活著離開', intel: '污染不必只是負面狀態。真正有意思的是它同時給能力與長期條件，而且代價可能延後結算。' })
+    ], { type: 'survival', ageAtEnd: 37, closestMoment: '帶著低度機緣污染活著離開', intel: '污染不必只是負面狀態。真正有意思的是它同時給能力與長期條件，而且代價可能延後結算。', continueTo: 'ch4_descent_entry', continueLabel: '第四章：下山去白石仙城' })
   };
 })();
