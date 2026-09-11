@@ -1578,13 +1578,62 @@
 
       Object.assign(SCENES, window.CHAPTER2_SCENES || {});
 
+      const queryParams = new URLSearchParams(window.location.search);
+      const isDevMode = queryParams.get('dev') === '1';
+      const requestedChapter = Number(queryParams.get('chapter') || 1);
+      const DEV_CHAPTER_ENTRY = {
+        1: 'intro',
+        2: 'ch2_contract_entry',
+        3: '__dev_chapter_3',
+        4: '__dev_chapter_4',
+        5: '__dev_chapter_5'
+      };
+
+      Object.assign(SCENES, {
+        __dev_chapter_3: {
+          bookChapter: 3,
+          chapter: '第三章・工程佔位',
+          title: '修仙界想吃我',
+          type: 'dev',
+          paragraphs: [
+            '第三章入口已在工程版開放。',
+            '本章正式定位為「坊市沒有好人」：情報、錢、逃跑與不要多問，玩家開始從自己死走向看別人死。',
+            '目前正文與互動場景尚未接入；這不是章節鎖定，而是工程佔位。'
+          ]
+        },
+        __dev_chapter_4: {
+          bookChapter: 4,
+          chapter: '第四章・工程佔位',
+          title: '打了小的，來了老的',
+          type: 'dev',
+          paragraphs: [
+            '第四章入口已在工程版開放。',
+            '本章核心是套娃追殺：打了小的，來了老的；但今天的小的就是主角。',
+            '玩家開始擁有籌碼，也因此被更大的宗門、家族與利益鏈盯上。正文與互動場景尚待接入。'
+          ]
+        },
+        __dev_chapter_5: {
+          bookChapter: 5,
+          chapter: '第五章・工程佔位',
+          title: '我還算人嗎？',
+          type: 'dev',
+          paragraphs: [
+            '第五章入口已在工程版開放。',
+            '本章承接「讓別人死」與弒龍者終成惡龍：玩家終於能把風險往下推，但必須決定自己還要不要繼續往上爬。',
+            '目前先保留章節入口與主題規格，正文與互動場景尚待接入。'
+          ]
+        }
+      });
+
       const root = document.getElementById('gameRoot');
       const content = document.getElementById('gameContent');
       const statusBar = document.getElementById('statusBar');
       const gameTitleBar = document.getElementById('gameTitleBar');
       const fontButtons = Array.from(document.querySelectorAll('[data-font-size]'));
       let state = { ...INITIAL };
-      let sceneKey = 'intro';
+      let sceneKey = isDevMode && DEV_CHAPTER_ENTRY[requestedChapter]
+        ? DEV_CHAPTER_ENTRY[requestedChapter]
+        : 'intro';
       let timer = null;
       let typingTimer = null;
       let runToken = 0;
@@ -1628,10 +1677,12 @@
       }
 
       function updateStatus(scene) {
-        const label = scene && scene.type === 'death' ? '已死' : scene && scene.type === 'survival' ? '存活' : '輪迴中';
-        const bookChapter = scene && Number(scene.bookChapter) === 2 ? 2 : 1;
-        if (gameTitleBar) gameTitleBar.textContent = `凡人不修仙：第${bookChapter === 2 ? '二' : '一'}章`;
-        document.title = `凡人不修仙｜第${bookChapter === 2 ? '二' : '一'}章`;
+        const label = scene && scene.type === 'death' ? '已死' : scene && scene.type === 'survival' ? '存活' : scene && scene.type === 'dev' ? '工程' : '輪迴中';
+        const bookChapter = clamp(Number(scene && scene.bookChapter) || 1, 1, 5);
+        const chapterNames = ['一', '二', '三', '四', '五'];
+        const chapterName = chapterNames[bookChapter - 1];
+        if (gameTitleBar) gameTitleBar.textContent = `凡人不修仙：第${chapterName}章${isDevMode ? '・工程版' : ''}`;
+        document.title = `凡人不修仙｜第${chapterName}章${isDevMode ? '・工程版' : ''}`;
         statusBar.innerHTML = `
           <span class="stat">銅錢 <strong>${state.coins}</strong></span>
           <span class="stat">氣血 <strong>${state.qi}</strong></span>
@@ -1692,6 +1743,7 @@
         updateStatus(scene);
         if (!scene) return renderMissing(sceneKey);
         if (scene.closestMoment) state.closestMoment = scene.closestMoment;
+        if (scene.type === 'dev') return renderDevChapter(scene);
         if (scene.type === 'death') return renderDeath(scene);
         if (scene.type === 'survival') return renderSurvival(scene);
 
@@ -1827,6 +1879,32 @@
             if (!Number.isFinite(idx) || !choices[idx]) return;
             choose(choices[idx]);
           });
+        });
+      }
+
+      function renderDevChapter(scene) {
+        updateStatus(scene);
+        const paragraphs = Array.isArray(scene.paragraphs) ? scene.paragraphs : [];
+        content.innerHTML = `
+          <div class="survival-screen">
+            <div class="survival-card">
+              <div class="survival-title">工程章節已開放</div>
+              <div class="survival-subtitle">ENTRY OPEN · CONTENT WIP</div>
+              ${paragraphs.map(p => `<p>${escapeHtml(p)}</p>`).join('')}
+            </div>
+            <div class="intel-box"><div class="intel-label">工程說明</div><div class="intel-text">此頁刻意保持可進入狀態。後續只要把本章正式場景資料接到章節入口，不需要再改解鎖流程。</div></div>
+            <div class="footer-actions">
+              <button class="restart-btn" type="button" id="devChapterMenuBtn">回工程版章節選擇</button>
+              <button class="home-btn" type="button" id="playerHomeBtn">回玩家版第一章</button>
+            </div>
+          </div>
+        `;
+        content.scrollTop = 0;
+        content.querySelector('#devChapterMenuBtn').addEventListener('click', () => {
+          window.location.href = './fanren-dev.html';
+        });
+        content.querySelector('#playerHomeBtn').addEventListener('click', () => {
+          window.location.href = './fanren.html';
         });
       }
 

@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#090704" />
+  <title>凡人不修仙｜工程版章節選擇</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700&family=Ma+Shan+Zheng&display=swap');
+    :root {
+      --bg: #080603;
+      --panel: rgba(24, 16, 7, .94);
+      --panel2: rgba(38, 25, 9, .86);
+      --ink: #d4b071;
+      --ink-strong: #efd39b;
+      --muted: #806846;
+      --line: rgba(199, 145, 61, .24);
+      --line-strong: rgba(220, 162, 72, .62);
+      --dev: #d56c3a;
+      --ready: #8cad67;
+    }
+    * { box-sizing: border-box; }
+    html { color-scheme: dark; background: var(--bg); }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
+      background:
+        radial-gradient(circle at 50% -10%, rgba(166, 104, 29, .18), transparent 34rem),
+        linear-gradient(180deg, #171006 0%, #090704 47%, #050403 100%);
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .2;
+      background-image:
+        linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.015) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(to bottom, #000, transparent 88%);
+    }
+    .shell {
+      width: min(760px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: max(22px, env(safe-area-inset-top)) 0 max(34px, env(safe-area-inset-bottom));
+      position: relative;
+      z-index: 1;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 34px;
+    }
+    .dev-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border: 1px solid rgba(213,108,58,.45);
+      color: #e58a5c;
+      background: rgba(100, 35, 15, .22);
+      font: 700 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: .14em;
+    }
+    .dev-badge::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 10px currentColor;
+    }
+    .back {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 12px;
+      letter-spacing: .08em;
+    }
+    .hero {
+      text-align: center;
+      margin-bottom: 27px;
+    }
+    .kicker {
+      color: #735932;
+      font-size: 11px;
+      letter-spacing: .28em;
+      margin-bottom: 8px;
+    }
+    h1 {
+      margin: 0;
+      color: var(--ink-strong);
+      font-family: 'Ma Shan Zheng', 'Noto Serif TC', serif;
+      font-size: clamp(38px, 10vw, 64px);
+      font-weight: 400;
+      letter-spacing: .1em;
+      text-shadow: 0 0 28px rgba(200, 140, 55, .12);
+    }
+    .intro {
+      max-width: 560px;
+      margin: 15px auto 0;
+      color: #8a704b;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 0 0 14px;
+    }
+    .summary div {
+      border: 1px solid rgba(145, 100, 36, .18);
+      background: rgba(14, 9, 4, .56);
+      padding: 10px;
+      text-align: center;
+      color: #705636;
+      font-size: 10px;
+      letter-spacing: .08em;
+    }
+    .summary strong { display: block; margin-top: 4px; color: #b58d51; font-size: 15px; font-weight: 500; }
+    .chapters { display: grid; gap: 10px; }
+    .chapter {
+      display: grid;
+      grid-template-columns: 48px minmax(0,1fr) auto;
+      gap: 13px;
+      align-items: center;
+      min-height: 112px;
+      padding: 15px 15px 15px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid rgba(183, 126, 45, .52);
+      background: linear-gradient(135deg, var(--panel), var(--panel2));
+      color: inherit;
+      text-decoration: none;
+      box-shadow: inset 0 1px rgba(255,255,255,.025), 0 12px 28px rgba(0,0,0,.2);
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+    .chapter:hover, .chapter:focus-visible {
+      transform: translateX(3px);
+      border-color: var(--line-strong);
+      outline: none;
+      background: linear-gradient(135deg, rgba(40,26,9,.98), rgba(49,31,10,.94));
+    }
+    .chapter-number {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(190,135,50,.35);
+      color: #a77a3f;
+      font: 700 16px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      transform: rotate(45deg);
+    }
+    .chapter-number span { transform: rotate(-45deg); }
+    .chapter-title { margin: 0 0 5px; color: #d9b575; font-size: 18px; font-weight: 500; }
+    .chapter-desc { margin: 0; color: #745c3c; font-size: 12px; line-height: 1.6; }
+    .meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 7px;
+      min-width: 76px;
+    }
+    .status {
+      padding: 5px 7px;
+      border: 1px solid rgba(130,90,35,.26);
+      color: #806846;
+      font: 700 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: .1em;
+      white-space: nowrap;
+    }
+    .status.ready { color: var(--ready); border-color: rgba(140,173,103,.36); background: rgba(67, 95, 49, .13); }
+    .status.open { color: #cf845d; border-color: rgba(213,108,58,.36); background: rgba(100,35,15,.13); }
+    .arrow { color: #9b7440; font-size: 20px; }
+    .note {
+      margin-top: 17px;
+      border: 1px dashed rgba(150,105,40,.24);
+      padding: 12px 14px;
+      color: #6f5738;
+      background: rgba(12, 8, 4, .46);
+      font-size: 11px;
+      line-height: 1.75;
+    }
+    @media (max-width: 560px) {
+      .shell { width: min(100% - 18px, 460px); }
+      .summary { grid-template-columns: 1fr 1fr 1fr; }
+      .chapter { grid-template-columns: 42px minmax(0,1fr); padding: 14px 12px; }
+      .meta { grid-column: 2; align-items: flex-start; flex-direction: row; }
+      .chapter-title { font-size: 17px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="topbar">
+      <div class="dev-badge">ENGINEERING BUILD</div>
+      <a class="back" href="./index.html">← GAME POOL</a>
+    </div>
+
+    <section class="hero">
+      <div class="kicker">凡人不修仙 · 開發工具</div>
+      <h1>章節全開放</h1>
+      <p class="intro">工程版不檢查玩家進度。五章入口全部可點，用來直接驗證章節、互動、節奏與後續接線；不影響正式玩家版的正常流程。</p>
+    </section>
+
+    <section class="summary" aria-label="工程版狀態">
+      <div>章節<strong>5 / 5 開放</strong></div>
+      <div>可玩正文<strong>1–2 章</strong></div>
+      <div>工程佔位<strong>3–5 章</strong></div>
+    </section>
+
+    <nav class="chapters" aria-label="工程版章節入口">
+      <a class="chapter" href="./fanren.html?dev=1&chapter=1">
+        <div class="chapter-number"><span>01</span></div>
+        <div>
+          <h2 class="chapter-title">第一章｜我想修仙</h2>
+          <p class="chapter-desc">村外有仙。普通凡人第一次碰到仙途，核心是「自己死」與世界規則學習。</p>
+        </div>
+        <div class="meta"><span class="status ready">PLAYABLE</span><span class="arrow">→</span></div>
+      </a>
+
+      <a class="chapter" href="./fanren.html?dev=1&chapter=2">
+        <div class="chapter-number"><span>02</span></div>
+        <div>
+          <h2 class="chapter-title">第二章｜仙門不要我</h2>
+          <p class="chapter-desc">山門不渡凡人。從短契、雜役、規矩到外門補錄，直接跳過第一章進入測試。</p>
+        </div>
+        <div class="meta"><span class="status ready">PLAYABLE</span><span class="arrow">→</span></div>
+      </a>
+
+      <a class="chapter" href="./fanren.html?dev=1&chapter=3">
+        <div class="chapter-number"><span>03</span></div>
+        <div>
+          <h2 class="chapter-title">第三章｜修仙界想吃我</h2>
+          <p class="chapter-desc">坊市沒有好人。情報、錢、逃跑與「看別人死」將成為主要生存手段。</p>
+        </div>
+        <div class="meta"><span class="status open">OPEN / WIP</span><span class="arrow">→</span></div>
+      </a>
+
+      <a class="chapter" href="./fanren.html?dev=1&chapter=4">
+        <div class="chapter-number"><span>04</span></div>
+        <div>
+          <h2 class="chapter-title">第四章｜打了小的，來了老的</h2>
+          <p class="chapter-desc">套娃追殺。今天的小的就是主角；贏下眼前事件，可能只是把更大的因果鏈叫過來。</p>
+        </div>
+        <div class="meta"><span class="status open">OPEN / WIP</span><span class="arrow">→</span></div>
+      </a>
+
+      <a class="chapter" href="./fanren.html?dev=1&chapter=5">
+        <div class="chapter-number"><span>05</span></div>
+        <div>
+          <h2 class="chapter-title">第五章｜我還算人嗎？</h2>
+          <p class="chapter-desc">你終於有能力讓別人替你承擔風險。核心不是打王，而是「讓別人死」之後還要不要繼續往上爬。</p>
+        </div>
+        <div class="meta"><span class="status open">OPEN / WIP</span><span class="arrow">→</span></div>
+      </a>
+    </nav>
+
+    <div class="note">工程規則：所有章節入口永遠顯示，不做存檔、死亡次數、前章通關條件檢查。未完成章節仍可進入工程佔位頁，避免測試時誤以為是「被鎖」。</div>
+  </main>
+</body>
+</html>
