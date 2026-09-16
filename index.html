@@ -280,6 +280,94 @@
       const split=Math.ceil(name.length/2); return [name.slice(0,split),name.slice(split)];
     }
 
+    function rgba(hex, alpha){
+      const n=parseInt(hex.replace('#',''),16);
+      const r=(n>>16)&255, g=(n>>8)&255, b=n&255;
+      return `rgba(${r},${g},${b},${alpha})`;
+    }
+
+    function drawPlanetBall(x,y,radius,color,brightness,hot,now,seed){
+      const pulse = reduceMotion ? 1 : 1 + Math.sin(now*.0018 + seed*.9) * .018;
+      const r = radius * pulse;
+      const glowRadius = r * (2.35 + brightness*1.35);
+
+      // Atmospheric glow behind the sphere.
+      const halo=ctx.createRadialGradient(x,y,r*.18,x,y,glowRadius);
+      halo.addColorStop(0,rgba(color,hot?.72:.28+brightness*.42));
+      halo.addColorStop(.28,rgba(color,hot?.28:.07+brightness*.18));
+      halo.addColorStop(1,rgba(color,0));
+      ctx.fillStyle=halo;
+      ctx.beginPath(); ctx.arc(x,y,glowRadius,0,Math.PI*2); ctx.fill();
+
+      ctx.save();
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.clip();
+
+      // Main sphere: small bright source at the upper-left, broad falloff to a dark lower-right limb.
+      const drift = reduceMotion ? 0 : Math.sin(now*.00025 + seed) * r*.045;
+      const body=ctx.createRadialGradient(
+        x-r*.42+drift, y-r*.46-drift*.3, r*.03,
+        x+r*.18, y+r*.20, r*1.22
+      );
+      body.addColorStop(0,'rgba(255,255,255,.98)');
+      body.addColorStop(.12,rgba(color,.96));
+      body.addColorStop(.48,rgba(color,.90));
+      body.addColorStop(.76,rgba(color,.62));
+      body.addColorStop(1,'rgba(2,5,12,.92)');
+      ctx.globalAlpha=hot?1:.48+brightness*.52;
+      ctx.fillStyle=body;
+      ctx.fillRect(x-r,y-r,r*2,r*2);
+
+      // Soft terminator gives the sphere a real shaded hemisphere instead of a flat disc.
+      const shade=ctx.createRadialGradient(x-r*.30,y-r*.34,r*.15,x+r*.30,y+r*.34,r*1.08);
+      shade.addColorStop(0,'rgba(0,0,0,0)');
+      shade.addColorStop(.54,'rgba(0,0,0,.02)');
+      shade.addColorStop(.80,'rgba(0,0,0,.22)');
+      shade.addColorStop(1,'rgba(0,0,0,.58)');
+      ctx.globalAlpha=hot?.88:.62+brightness*.22;
+      ctx.fillStyle=shade;
+      ctx.fillRect(x-r,y-r,r*2,r*2);
+
+      // Glassy specular bloom, slightly animated so larger active worlds feel alive.
+      const hx=x-r*.38+drift, hy=y-r*.43-drift*.25;
+      const spec=ctx.createRadialGradient(hx,hy,0,hx,hy,r*.58);
+      spec.addColorStop(0,'rgba(255,255,255,.92)');
+      spec.addColorStop(.20,'rgba(255,255,255,.48)');
+      spec.addColorStop(.55,'rgba(255,255,255,.10)');
+      spec.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.globalAlpha=.32+brightness*.42+(hot?.16:0);
+      ctx.fillStyle=spec;
+      ctx.fillRect(x-r,y-r,r*2,r*2);
+
+      // Subtle reflected light on the lower-right edge prevents the dark side from collapsing to black.
+      const bounce=ctx.createRadialGradient(x+r*.55,y+r*.52,0,x+r*.55,y+r*.52,r*.62);
+      bounce.addColorStop(0,rgba(color,.24+brightness*.15));
+      bounce.addColorStop(1,rgba(color,0));
+      ctx.globalAlpha=.55;
+      ctx.fillStyle=bounce;
+      ctx.fillRect(x-r,y-r,r*2,r*2);
+      ctx.restore();
+
+      // Rim and a short bright arc make the silhouette read as a sphere even at small mobile sizes.
+      ctx.save();
+      ctx.globalAlpha=hot?1:.30+brightness*.58;
+      ctx.strokeStyle=hot?'rgba(255,255,255,.94)':rgba(color,.92);
+      ctx.lineWidth=hot?1.6:1;
+      ctx.beginPath(); ctx.arc(x,y,r+.8,0,Math.PI*2); ctx.stroke();
+      ctx.globalAlpha=hot?.92:.24+brightness*.32;
+      ctx.strokeStyle='rgba(255,255,255,.92)';
+      ctx.lineWidth=Math.max(.8,r*.055);
+      ctx.beginPath(); ctx.arc(x,y,r*.84,Math.PI*1.08,Math.PI*1.56); ctx.stroke();
+      ctx.restore();
+
+      if(hot){
+        ctx.strokeStyle=rgba(color,.48);
+        ctx.lineWidth=1;
+        ctx.beginPath();
+        ctx.arc(x,y,r+10+(reduceMotion?0:Math.sin(now*.004)*2),0,Math.PI*2);
+        ctx.stroke();
+      }
+    }
+
     function drawNodes(now){
       ctx.textAlign='center';
       projects.forEach((p,i)=>{
@@ -288,19 +376,8 @@
         const base=W<760?9.5:12;
         const radius=base*p.r+(hot?2.5:0);
         p._hit=Math.max(22,radius+8);
-        const glowRadius=radius*(2.15+p.b*1.55);
-        const glow=ctx.createRadialGradient(q.x,q.y,0,q.x,q.y,glowRadius);
-        const bright=Math.round((.24+p.b*.66)*255).toString(16).padStart(2,'0');
-        const mid=Math.round((.08+p.b*.28)*255).toString(16).padStart(2,'0');
-        glow.addColorStop(0,hot?p.color+'ff':p.color+bright); glow.addColorStop(.30,p.color+mid); glow.addColorStop(1,p.color+'00');
-        ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(q.x,q.y,glowRadius,0,Math.PI*2); ctx.fill();
-        ctx.save();
-        ctx.globalAlpha=hot?1:.28+p.b*.72;
-        ctx.fillStyle=hot?'#fff':p.color; ctx.beginPath(); ctx.arc(q.x,q.y,radius,0,Math.PI*2); ctx.fill();
-        ctx.globalAlpha=hot?1:.22+p.b*.62;
-        ctx.strokeStyle=hot?'rgba(255,255,255,.92)':p.color; ctx.lineWidth=hot?1.4:.8; ctx.beginPath(); ctx.arc(q.x,q.y,radius+4+(p.r>1.5?2:0),0,Math.PI*2); ctx.stroke();
-        ctx.restore();
-        if(hot){ ctx.strokeStyle=p.color+'66'; ctx.beginPath(); ctx.arc(q.x,q.y,radius+10+(reduceMotion?0:Math.sin(now*.004)*2),0,Math.PI*2); ctx.stroke(); }
+
+        drawPlanetBall(q.x,q.y,radius,p.color,p.b,hot,now,i+1);
 
         const showLabel = hot || W>=760 || p.r>=1.5;
         if(showLabel){
