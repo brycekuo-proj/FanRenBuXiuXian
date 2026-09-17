@@ -286,10 +286,11 @@
       return `rgba(${r},${g},${b},${alpha})`;
     }
 
-    function drawPlanetBall(x,y,radius,color,brightness,hot,now,seed){
+    function drawPlanetBall(x,y,radius,glowBaseRadius,color,brightness,hot,now,seed){
       const pulse = reduceMotion ? 1 : 1 + Math.sin(now*.0018 + seed*.9) * .018;
       const r = radius * pulse;
-      const glowRadius = r * (2.35 + brightness*1.35);
+      // Keep the halo at its previous footprint even though the visible sphere is 50% smaller.
+      const glowRadius = glowBaseRadius * pulse * (2.35 + brightness*1.35);
 
       // Atmospheric glow behind the sphere.
       const halo=ctx.createRadialGradient(x,y,r*.18,x,y,glowRadius);
@@ -374,10 +375,11 @@
         const q=nodePos(p,now); p._x=q.x; p._y=q.y;
         const hot=hovered===p || selected===p;
         const base=W<760?9.5:12;
-        const radius=base*p.r+(hot?2.5:0);
-        p._hit=Math.max(22,radius+8);
+        const fullRadius=base*p.r+(hot?2.5:0);
+        const radius=fullRadius*.5;
+        p._hit=Math.max(22,fullRadius+8);
 
-        drawPlanetBall(q.x,q.y,radius,p.color,p.b,hot,now,i+1);
+        drawPlanetBall(q.x,q.y,radius,fullRadius,p.color,p.b,hot,now,i+1);
 
         const showLabel = hot || W>=760 || p.r>=1.5;
         if(showLabel){
