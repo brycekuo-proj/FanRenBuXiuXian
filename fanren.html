@@ -142,6 +142,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-wrap: wrap;
       gap: 6px;
       margin-top: 8px;
       color: #6b4f28;
@@ -153,6 +154,7 @@
       margin-right: 2px;
       white-space: nowrap;
     }
+    #saveStatus { font-size: 10px; letter-spacing: 0; }
 
     .font-btn {
       min-width: 34px;
@@ -618,17 +620,25 @@
         <button class="font-btn" type="button" data-font-size="small" aria-pressed="false">小</button>
         <button class="font-btn" type="button" data-font-size="medium" aria-pressed="true">中</button>
         <button class="font-btn" type="button" data-font-size="large" aria-pressed="false">大</button>
+        <span>速度</span>
+        <button class="font-btn" type="button" data-reading-speed="slow" aria-pressed="false">慢</button>
+        <button class="font-btn" type="button" data-reading-speed="normal" aria-pressed="true">中</button>
+        <button class="font-btn" type="button" data-reading-speed="fast" aria-pressed="false">快</button>
+        <button class="font-btn" type="button" id="newLifeBtn">新的一世</button>
+        <span id="saveStatus" role="status" aria-live="polite">本機自動存檔</span>
       </div>
     </header>
     <section class="game-content" id="gameContent" aria-live="polite"></section>
   </main>
 
+  <script src="data/runtime/continuity.js"></script>
   <script src="data/runtime/chapter2_scenes.js"></script>
   <script src="data/runtime/chapter3_scenes.js"></script>
   <script src="data/runtime/chapter4_scenes.js"></script>
   <script src="data/runtime/chapter5_scenes.js"></script>
   <script>
     (() => {
+      const C = window.FANREN_CONTINUITY;
       const INITIAL = Object.freeze({ coins: 3, qi: 80, deaths: 0, age: 17, merit: 0, pollution: 0, intel: 0, appraisal: 0, trust: 50, betrayal: 15, spiritStone: 3, blackCredit: 0, karma: 0, wanted: 0, factionSect: 0, factionGu: 0, factionBlack: 0, factionGov: 0, riskShift: 0, responsibility: 0, exitWill: 0, closestMoment: '尚未摸到仙途' });
 
       const SCENES = {
@@ -890,12 +900,44 @@
           paragraphs: [
             '你到了青雲山下，鞋破了，包袱瘦了，肚子空了。',
             '山門前排著長長的人龍。有富戶子弟坐在轎旁喝茶，也有像你這樣的少年蹲在路邊吞口水。',
-            '你摸了摸錢袋。裡面輕得像你的前途。'
+            '你摸了摸錢袋。裡面輕得像你的前途。',
+            '台階石縫留著深褐的痕跡。瘸腿雜役說，今日靈壓又重了，不吃飯爬上去的人，昨天也沒幾個爬回來。'
           ],
           choices: [
             { text: '硬爬山門台階，省下最後的錢', next: 'sect_stairs_death', risk: '高' },
             { text: '把最後銅錢買饅頭，先活過今天', next: 'reject_alive', coinDelta: -1, moment: '活著下山' },
             { text: '向富戶子弟借一口茶', next: 'humiliation_servant', moment: '被富戶看見自己很好用' }
+          ]
+        },
+        sect_stairs_death: {
+          chapter: '青雲山下',
+          title: '山門台階吃了飯',
+          type: 'death',
+          ageAtDeath: 17,
+          closestMoment: '爬到青雲山門第九十九階',
+          paragraphs: [
+            '你想把最後一枚銅錢留到入門之後。於是你空著肚子爬山門，第一段還有人笑你腿軟。',
+            '第七十階後，石階陣紋開始發熱；第九十九階，胸口像被一隻看不見的手按住。',
+            '瘸腿雜役曾提醒靈壓與餓肚子不能一起硬扛。他來得及伸手，卻沒來得及把你從台階上拖回去。'
+          ],
+          death: {
+            cause: '飢餓與舊傷使凡人無法承受山門階梯靈壓。',
+            epitaph: '此地長眠著王狗蛋，享年十七。\n他把最後一枚銅錢留給仙途。\n仙途沒收錢，改收了命。'
+          },
+          intel: '高階宗門的日常環境也可能傷害凡人。留意靈壓、體力與進入條件；先吃飯並非懦弱。'
+        },
+        humiliation_servant: {
+          chapter: '青雲山下',
+          title: '一口茶的價錢',
+          paragraphs: [
+            '富家子弟把茶壺往旁邊一推：「想喝可以，先替我背箱。」你看見他身後的僕人沒有抬頭。',
+            '你想問一口茶值多少。他說等上山自然有人照應，於是連一個確切的價錢都省了。',
+            '你現在可以接受這筆人情債，也可以把空腹留給自己。'
+          ],
+          choices: [
+            { text: '背箱換茶，先進山再說', next: 'spirit_stone_labor', qiDelta: 4, moment: '第一次替富戶背箱換進山資格' },
+            { text: '拒絕，排回原本那條隊伍', next: 'sect_arrive', qiDelta: -4 },
+            { text: '今日不進山，先找別的活路', next: 'reject_alive', moment: '拒絕把一口茶欠成一輩子' }
           ]
         },
         sect_arrive: {
@@ -1638,17 +1680,45 @@
       const statusBar = document.getElementById('statusBar');
       const gameTitleBar = document.getElementById('gameTitleBar');
       const fontButtons = Array.from(document.querySelectorAll('[data-font-size]'));
-      let state = { ...INITIAL };
+      const speedButtons = Array.from(document.querySelectorAll('[data-reading-speed]'));
+      const saveStatus = document.getElementById('saveStatus');
+      const storage = (() => { try { return window.localStorage; } catch (_) { return {getItem: () => null, setItem: () => { throw new Error('storage disabled'); }}; } })();
+      const oldSave = isDevMode ? null : C.load(storage);
+      let meta = oldSave ? oldSave.meta : C.freshMeta();
+      const restored = oldSave && oldSave.current && SCENES[oldSave.current.sceneKey] ? oldSave.current : null;
+      let state = { ...INITIAL, deaths: meta.deaths };
+      if (restored && restored.state) {
+        for (const [key, baseline] of Object.entries(INITIAL)) {
+          const value = restored.state[key];
+          if (typeof baseline === 'number' && Number.isFinite(value)) state[key] = Math.max(-1000, Math.min(1000000, value));
+          else if (key === 'closestMoment' && typeof value === 'string') state[key] = value.slice(0, 240);
+        }
+        state.deaths = meta.deaths;
+      }
       let sceneKey = isDevMode && DEV_CHAPTER_ENTRY[requestedChapter]
         ? DEV_CHAPTER_ENTRY[requestedChapter]
-        : 'intro';
+        : restored ? restored.sceneKey : 'intro';
+      let run = restored && restored.run && Number.isFinite(restored.run.rngState) ? restored.run : makeRun();
+      let fate = restored && restored.fate ? restored.fate : C.newFate(run.rngState);
+      let npcs = restored && restored.npcs && typeof restored.npcs === 'object' ? restored.npcs : {};
+      let pendingAuto = restored && restored.pendingAuto || null;
+      let terminalRecorded = restored && restored.terminalRecorded || null;
+      const reader = C.readSettings(storage);
+      let readingSpeed = reader.speed;
+      function makeRun() {
+        return { rngState: ((Date.now() ^ Math.floor(Math.random() * 4294967295)) >>> 0) || 1, drawCount: 0 };
+      }
+      function saveGame() {
+        if (isDevMode) return;
+        const ok = C.save(storage, meta, { sceneKey, state, run, fate, npcs, pendingAuto, terminalRecorded });
+        if (saveStatus) saveStatus.textContent = ok ? '已自動存檔' : '無法儲存（隱私模式？）';
+      }
       let timer = null;
       let typingTimer = null;
       let runToken = 0;
       let activeReveal = null;
-      const TYPE_DELAY_MS = 46;
-      const PUNCTUATION_DELAY_MS = 260;
-      const PARAGRAPH_PAUSE_MS = 720;
+      const SPEEDS = { slow: [65, 360, 900], normal: [40, 260, 650], fast: [15, 120, 260] };
+      const getSpeed = () => SPEEDS[readingSpeed] || SPEEDS.normal;
 
       function clearTimers() {
         clearTimeout(timer);
@@ -1657,14 +1727,21 @@
         activeReveal = null;
       }
 
+      function persistReader() { C.saveSettings(storage, { font: reader.font, speed: readingSpeed }); }
       function setFontSize(size) {
         const safe = ['small', 'medium', 'large'].includes(size) ? size : 'medium';
+        reader.font = safe;
         root.classList.remove('font-small', 'font-medium', 'font-large');
         root.classList.add(`font-${safe}`);
         fontButtons.forEach(button => {
-          const pressed = button.getAttribute('data-font-size') === safe;
-          button.setAttribute('aria-pressed', String(pressed));
+          button.setAttribute('aria-pressed', String(button.getAttribute('data-font-size') === safe));
         });
+        persistReader();
+      }
+      function setReadingSpeed(speed) {
+        readingSpeed = ['slow', 'normal', 'fast'].includes(speed) ? speed : 'normal';
+        speedButtons.forEach(button => button.setAttribute('aria-pressed', String(button.getAttribute('data-reading-speed') === readingSpeed)));
+        persistReader();
       }
 
       function clamp(n, min, max) {
@@ -1758,39 +1835,35 @@
       }
 
       function go(next) {
-        if (!SCENES[next]) {
-          renderMissing(next);
-          return;
-        }
+        if (!SCENES[next]) { renderMissing(next); return; }
         sceneKey = next;
+        pendingAuto = null;
+        if (next === 'ch2_senior_intro') npcs = C.recordNpc(npcs, { id:'zheng', status:'相識', note:'鄭師兄給了你第一個帶著人情價的差事', chapter:2 });
+        if (next === 'ch3_team') npcs = C.recordNpc(npcs, { id:'liang', status:'同行', note:'梁敬說進去一起、不搶；話說在機緣出現以前', chapter:3 });
+        if (next === 'ch3_betrayal') npcs = C.recordNpc(npcs, { id:'liang', status:'分配生變', note:'你們在古物前終於明白，先前說好的規矩未必承受得住機緣', chapter:3 });
+        if (next === 'ch4_descent_chen') npcs = C.recordNpc(npcs, { id:'chen', status:'同行', note:'白石藥路的舊同伴', chapter:4 });
+        if (next === 'ch4_plague_doctor') npcs = C.recordNpc(npcs, { id:'doctor', status:'相識', note:'凡人趙醫官堅持先辨病再給藥', chapter:4 });
+        if (next === 'ch4_siege_box') npcs = C.recordNpc(npcs, { id:'gu', status:'交託木匣', note:'顧十三將一只不能隨意打開的木匣託給你', chapter:4 });
+        if (next === 'ch5_lead_entry') {
+          for (const id of ['zhou','he','pei']) if (!npcs[id]) npcs = C.recordNpc(npcs, { id, status:'同行', note:'白石藥路初次受你分配任務', chapter:5 });
+        }
+        if (next === 'ch5_cave_bells_bad') npcs = C.recordNpc(npcs, { id:'he', status:'死亡', note:'何春禾在第二個探煞鈴前被灰膜吞沒；留下了時間情報', chapter:5 });
+        if (next === 'ch5_cave_he_dead') npcs = C.recordNpc(npcs, { id:'he', status:'死亡', note:'北三洞灰膜奪走了何春禾；她的債務沒有消失', chapter:5 });
+        if (next === 'ch5_lead_bridge_volunteer_death') npcs = C.recordNpc(npcs, { id:'zhou', status:'死亡', note:'周小滿自願先過橋，仍不知殘陣的全部風險', chapter:5 });
+        if (next === 'ch5_curse_marked' || next === 'ch5_curse_linked') npcs = C.recordNpc(npcs, { id:'duan', status:'受代', note:'段霄替你先碰了詛咒法器', chapter:5 });
+        saveGame();
         renderScene();
       }
 
       function pickWeighted(items) {
-        if (!Array.isArray(items) || !items.length) return null;
-        const normalized = items.map(item => ({ ...item, weight: Math.max(0, Number(item.weight) || 1) }));
-        const total = normalized.reduce((sum, item) => sum + item.weight, 0);
-        if (total <= 0) return normalized[0] && normalized[0].next;
-        let roll = Math.random() * total;
-        for (const item of normalized) {
-          roll -= item.weight;
-          if (roll <= 0) return item.next;
-        }
-        return normalized[normalized.length - 1].next;
+        return C.chooseWeighted(items, run);
       }
 
       function getStateValue(stat) {
         return Number(state && state[stat]) || 0;
       }
 
-      function meetsRequirements(choice) {
-        if (!choice) return false;
-        const spiritStoneDelta = Number(choice.spiritStoneDelta) || 0;
-        if (spiritStoneDelta < 0 && state.spiritStone < Math.abs(spiritStoneDelta)) return false;
-        const requires = choice.requires;
-        if (!requires || typeof requires !== 'object') return true;
-        return Object.entries(requires).every(([stat, threshold]) => getStateValue(stat) >= Number(threshold || 0));
-      }
+      function meetsRequirements(choice) { return !C.costProblem(choice, state); }
 
       function resolveChoiceNext(choice) {
         if (!choice) return null;
@@ -1806,24 +1879,30 @@
       }
 
       function choose(choice) {
+        if (!meetsRequirements(choice)) return;
         clearTimers();
         applyChoice(choice);
+        npcs = C.recordNpc(npcs, choice.npcEvent);
         const destination = resolveChoiceNext(choice);
         if (!destination) return renderMissing('choice-destination');
+        terminalRecorded = null;
         go(destination);
       }
 
       function getRandomAuto(scene) {
-        if (Array.isArray(scene.randomNexts) && scene.randomNexts.length) return pickWeighted(scene.randomNexts);
-        if (!scene.autoNext) return null;
-        if (typeof scene.autoNextProb === 'number' && scene.autoFailNext) {
-          return Math.random() < scene.autoNextProb ? scene.autoNext : scene.autoFailNext;
-        }
-        return scene.autoNext;
+        if (pendingAuto && pendingAuto.sceneKey === sceneKey) return pendingAuto.destination;
+        let destination = null;
+        if (sceneKey === 'life_roll') destination = fate.childhood;
+        else if (Array.isArray(scene.randomNexts) && scene.randomNexts.length) destination = pickWeighted(scene.randomNexts);
+        else if (scene.autoNext) destination = typeof scene.autoNextProb === 'number' && scene.autoFailNext
+          ? (C.nextRandom(run) < scene.autoNextProb ? scene.autoNext : scene.autoFailNext) : scene.autoNext;
+        if (destination) { pendingAuto = { sceneKey, destination }; saveGame(); }
+        return destination;
       }
 
       function renderScene() {
         clearTimers();
+        saveGame();
         const token = ++runToken;
         const scene = SCENES[sceneKey];
         updateStatus(scene);
@@ -1833,7 +1912,23 @@
         if (scene.type === 'death') return renderDeath(scene);
         if (scene.type === 'survival') return renderSurvival(scene);
 
-        const paragraphs = Array.isArray(scene.paragraphs) ? scene.paragraphs : [];
+        const paragraphs = Array.isArray(scene.paragraphs) ? scene.paragraphs.slice() : [];
+        if (sceneKey === 'intro' && meta.memories.length) {
+          paragraphs.unshift('有些模糊的殘念不屬於你。你記得的不是答案，只是前人斷氣前沒能說完的一句警告。');
+        }
+        if (sceneKey === 'ch5_lead_entry') {
+          if (npcs.zheng) paragraphs.push('第二章鄭師兄以「半個同門」叫你送信。你那時第一次知道，溫柔的稱呼也能把危險推給別人。');
+          if (npcs.liang) paragraphs.push('第三章梁敬說過「進去一起、不搶」。如今你握著一整隊人的分配權，才知道約定要活到出事的時候才算數。');
+          if (npcs.chen) paragraphs.push('你想起陳槐曾在白石城與你同行。今日你手上的領隊牌，正是當年你們都要看別人臉色才能摸到的東西。');
+          if (npcs.doctor) paragraphs.push('趙醫官在疫村教過你：救人的方法不能只看流程，還得先看人。那份因果沒有換成貢獻點。');
+          if (npcs.gu) paragraphs.push('顧十三曾把木匣託在你手裡。從那時起你就知道，別人願意託付並不等於你有能力承擔。');
+        }
+        if (sceneKey === 'ch5_final_crossroad') {
+          const names = { zhou:'周小滿', he:'何春禾', pei:'裴舟', duan:'段霄', chen:'陳槐', doctor:'趙醫官', gu:'顧十三', zheng:'鄭師兄', liang:'梁敬' };
+          for (const [id, person] of Object.entries(npcs)) {
+            if (names[id] && person && person.note) paragraphs.push(names[id] + '：' + person.note + '。你可以忘了當時如何辯解，名冊不能。');
+          }
+        }
         const choices = Array.isArray(scene.choices) ? scene.choices : [];
         content.innerHTML = `
           <div class="scene-chapter">${escapeHtml(scene.chapter || '第一章')}</div>
@@ -1847,6 +1942,7 @@
             <div class="fate-meter" aria-hidden="true"><div class="fate-meter-fill" id="fateMeterFill"></div></div>
             <div class="text-tools"><button class="skip-text-btn" type="button" id="skipTextBtn">快進文字</button></div>
           </div>
+          ${sceneKey === 'intro' && meta.memories.length ? '<div class="intel-box"><div class="intel-label">前世殘念 · 只留常識</div><div class="intel-text">' + escapeHtml(meta.memories.slice(-3).map(m => m.clue).filter(Boolean).join(' ／ ')) + '</div></div>' : ''}
           <div class="scene-paragraphs" id="paragraphMount"></div>
           <div id="choiceMount"></div>
         `;
@@ -1883,7 +1979,7 @@
             node.textContent = text.slice(0, idx);
             if (idx >= text.length) return finish();
             const prev = text[idx - 1] || '';
-            const pause = '。！？；……'.includes(prev) ? PUNCTUATION_DELAY_MS : TYPE_DELAY_MS;
+            const pause = '。！？；……'.includes(prev) ? getSpeed()[1] : getSpeed()[0];
             typingTimer = setTimeout(step, pause);
           };
           step();
@@ -1915,7 +2011,7 @@
           if (fill) fill.style.width = `${Math.round(((i + 1) / Math.max(paragraphs.length, 1)) * 100)}%`;
           if (hint) hint.textContent = i + 1 >= paragraphs.length ? '正文已讀完，現在才輪到你。' : '文字仍在繼續，先別急著選。';
           content.scrollTo({ top: content.scrollHeight, behavior: controller.skipAll ? 'auto' : 'smooth' });
-          await waitFor(PARAGRAPH_PAUSE_MS, token, controller);
+          await waitFor(getSpeed()[2], token, controller);
         }
         if (controller.cancelled || token !== runToken) return;
         const tools = content.querySelector('.text-tools');
@@ -1967,11 +2063,7 @@
               if (choice.exitWillDelta) cost.push(`退出意志 ${choice.exitWillDelta > 0 ? '+' : ''}${choice.exitWillDelta}`);
               if (choice.risk) cost.push(`風險：${choice.risk}`);
               const available = meetsRequirements(choice);
-              if (!available) {
-                const stoneCost = Number(choice.spiritStoneDelta) || 0;
-                const lacksStone = stoneCost < 0 && state.spiritStone < Math.abs(stoneCost);
-                cost.push(choice.requireText || (lacksStone ? '靈石不足' : '條件不足'));
-              }
+              if (!available) cost.push(C.costProblem(choice, state));
               return `<button class="choice-btn" type="button" data-choice-index="${idx}" ${available ? '' : 'disabled aria-disabled="true"'}>
                 <span class="choice-number">${idx + 1}.</span>${escapeHtml(choice.text)}
                 ${cost.length ? `<span class="choice-cost ${choice.risk ? 'choice-risk' : ''}">${escapeHtml(cost.join('｜'))}</span>` : ''}
@@ -2018,7 +2110,12 @@
       }
 
       function renderDeath(scene) {
-        state.deaths += 1;
+        if (terminalRecorded !== sceneKey) {
+          meta = C.recordMemory(meta, sceneKey, scene);
+          state.deaths = meta.deaths;
+          terminalRecorded = sceneKey;
+          saveGame();
+        }
         updateStatus(scene);
         const paragraphs = Array.isArray(scene.paragraphs) ? scene.paragraphs : [];
         content.innerHTML = `
@@ -2044,10 +2141,15 @@
         `;
         content.scrollTop = 0;
         content.querySelector('#restartBtn').addEventListener('click', restart);
-        content.querySelector('#chapterBtn').addEventListener('click', () => go(isDevMode && DEV_CHAPTER_ENTRY[requestedChapter] ? DEV_CHAPTER_ENTRY[requestedChapter] : 'start_choice'));
+        content.querySelector('#chapterBtn').addEventListener('click', () => { restart(); go(isDevMode && DEV_CHAPTER_ENTRY[requestedChapter] ? DEV_CHAPTER_ENTRY[requestedChapter] : 'start_choice'); });
       }
 
       function renderSurvival(scene) {
+        if (!scene.continueTo && terminalRecorded !== sceneKey) {
+          meta = C.recordEnding(meta, sceneKey, scene);
+          terminalRecorded = sceneKey;
+          saveGame();
+        }
         updateStatus(scene);
         const paragraphs = Array.isArray(scene.paragraphs) ? scene.paragraphs : [];
         content.innerHTML = `
@@ -2070,7 +2172,7 @@
         const continueBtn = content.querySelector('#continueBtn');
         if (continueBtn && scene.continueTo) continueBtn.addEventListener('click', () => go(scene.continueTo));
         content.querySelector('#restartBtn').addEventListener('click', restart);
-        content.querySelector('#chapterBtn').addEventListener('click', () => go(isDevMode && DEV_CHAPTER_ENTRY[requestedChapter] ? DEV_CHAPTER_ENTRY[requestedChapter] : 'start_choice'));
+        content.querySelector('#chapterBtn').addEventListener('click', () => { restart(); go(isDevMode && DEV_CHAPTER_ENTRY[requestedChapter] ? DEV_CHAPTER_ENTRY[requestedChapter] : 'start_choice'); });
       }
 
       function renderIntel(intel) {
@@ -2079,6 +2181,7 @@
       }
 
       function renderMissing(key) {
+        clearTimers();
         updateStatus({});
         content.innerHTML = `
           <div class="missing">
@@ -2094,17 +2197,30 @@
 
       function restart() {
         clearTimers();
-        state = { ...INITIAL, deaths: state.deaths };
+        meta.incarnations += 1;
+        state = { ...INITIAL, deaths: meta.deaths };
+        run = makeRun();
+        fate = C.newFate(run.rngState);
+        npcs = {};
+        pendingAuto = null;
+        terminalRecorded = null;
         sceneKey = isDevMode && DEV_CHAPTER_ENTRY[requestedChapter]
-          ? DEV_CHAPTER_ENTRY[requestedChapter]
-          : 'intro';
+          ? DEV_CHAPTER_ENTRY[requestedChapter] : 'intro';
+        saveGame();
         renderScene();
       }
 
       fontButtons.forEach(button => {
         button.addEventListener('click', () => setFontSize(button.getAttribute('data-font-size')));
       });
-      setFontSize('medium');
+      speedButtons.forEach(button => {
+        button.addEventListener('click', () => setReadingSpeed(button.getAttribute('data-reading-speed')));
+      });
+      setReadingSpeed(reader.speed);
+      setFontSize(reader.font);
+      document.getElementById('newLifeBtn').addEventListener('click', () => {
+        if (window.confirm('確定放棄本世進度，開始新的一世？前世殘念仍會保留。')) restart();
+      });
 
       root.addEventListener('keydown', (event) => {
         if (event.target && /INPUT|TEXTAREA|SELECT/.test(event.target.tagName)) return;

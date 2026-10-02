@@ -33,11 +33,15 @@
 
 同一個表面事件不能有固定正解。死亡畫面只能提供世界知識與風險徵兆，不能直接揭露「應該按哪個選項」。保守選項不能永遠安全，冒險選項也不能只是純骰子。
 
-## 目前製作重點
+## 目前製作重點（2026-10-02）
 
-目前不要擴章，不做大型系統。先集中重構第一章，讓死亡有伏筆、苟住有代價、墓誌銘值得截圖，並驗證玩家死後是否會想立刻再投一世。
+五章正文與互動第一版都已存在。請從 `fanren.html` 進入玩家版；`fanren-dev.html` 是不影響正式存檔的工程版章節入口。第五章正文主檔 `data/content/chapter5_full_text.md` 已補至 **75,103 個 Unicode 字元**，分段新增原稿另存於 `data/content/chapter5_addenda/`，可用 `python3 tools/merge_chapter5_addenda.py` 重新驗證與合併；新增正文的細部敘事變體並非全部已轉成可玩的場景。
 
-第一章已新增 5～6 萬字正文主檔：`data/content/chapter1_full_text.md`。此檔不是骨架，而是可直接拆入遊戲事件池、選項結果、死亡畫面、墓誌銘與死後情報的正文內容。既有 JSON 與事件圖則保留作 runtime 接入用。
+程式現有本機自動存檔、刷新續玩、字級／閱讀速度記憶，跨世保留死亡數與世界常識殘念。每一世重新抽取隱藏命線，紀錄本世重要 NPC 因果；殘念不會給你正確按鈕。僅使用瀏覽器本機儲存，不需要伺服器或付費 API，無痕模式／清除網站資料可能失去進度。
+
+## 本機檢查
+
+`node --test tests/continuity.test.cjs`：存檔、資源驗證、種子重現、NPC 基礎因果、五章場景圖。需做瀏覽器煙霧測試時，從專案根目錄啟動 `python3 -m http.server 28765 --bind 127.0.0.1`，另執行 `python3 tools/browser_smoke.py`（需本機 Playwright 與 Chrome／Chromium）。真人測試表與公平性問題請見 `docs/PLAYTEST_ROUND_1.md`；目前尚未進行真人輪迴驗收。
 
 ## 文件索引
 
@@ -58,3 +62,8 @@
 - `data/events/chapter1_content_blocks.md`：第一章人工可讀文案池
 - `data/content/chapter1_full_text.md`：第一章 5～6 萬字正文主檔
 - `data/epitaphs/epitaph_seed_bank.md`：墓誌銘素材庫
+- `PROJECT_STATUS.md`：目前五章內容與工程修正狀態
+- `data/runtime/continuity.js`：輪迴命簿／本機儲存／資源檢核與抽樣
+- `data/content/chapter5_addenda/`：第五章 5-1～5-11 分節補寫原稿
+- `tools/merge_chapter5_addenda.py`：增補合併與 Unicode 字元數檢查
+- `docs/PLAYTEST_ROUND_1.md`：真人輪迴驗收表及死亡公平性問題

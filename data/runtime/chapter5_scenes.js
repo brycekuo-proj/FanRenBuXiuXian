@@ -152,11 +152,16 @@
       '讓別人承擔風險並不總會死人。這正是它會變成常態的原因。'
     ], { choices: [{ text: '把這次成功記成結果，不記成正解', next: 'ch5_lead_rules', intelDelta: 4, responsibilityDelta: 2 }, { text: '證明這套分工有效，之後照做', next: 'ch5_lead_rules', riskShiftDelta: 5, factionSectDelta: 3 }] }),
 
-    ch5_lead_bridge_volunteer_death: death('代價停在你手裡', '自願先過', [
+    ch5_lead_bridge_volunteer_death: S('代價停在你手裡', '自願先過', [
       '周小滿踩到橋中段時，紫火沿舊索竄起。',
       '他只來得及回頭喊一聲。你們後面三個人因他的死看見了殘陣範圍。',
-      '他是自願的。額外功也寫在規矩裡。所有程序都很乾淨。'
-    ], '讓自願新人先過未知殘橋測路，觸發隱藏火陣死亡。', '他自己舉了手。\n所以所有人都比較容易說：\n不是我推的。', '自願能改善倫理條件，不能自動消除權力差與資訊差。誰知道風險、誰設計獎勵、誰能拒絕，仍然重要。'),
+      '他是自願的。額外功也寫在規矩裡。所有程序都很乾淨。',
+      '你仍然活著，必須帶著他的名字和另外兩名隊員走回外務堂。這不是你的墓誌銘。',
+      '殘念：自願不會自動消除資訊差。誰知道風險、誰能說不、誰設計獎勵，仍值得追問。'
+    ], { choices: [
+      { text:'帶著周小滿的名字回去，完整記錄決策', next:'ch5_lead_rules', responsibilityDelta:5, karmaDelta:6, trustDelta:-3 },
+      { text:'按「自願事故」上報，別讓任務評等拖累活人', next:'ch5_lead_rules', riskShiftDelta:7, factionSectDelta:3, trustDelta:-5 }
+    ] }),
 
     ch5_lead_rules: S('代價停在你手裡', '規矩很公平', [
       '執事說：「該誰拿功，誰擔風險。規矩很公平。」',
@@ -212,11 +217,15 @@
       '你清楚知道自己正在享受另一個人冒過的風險。她沒死，所以這看起來很正常。'
     ], { choices: [{ text: '只取任務要求的八株陰芝', next: 'ch5_cave_harvest', responsibilityDelta: 4 }, { text: '牆上還有四株，多採可以多拿功', next: 'ch5_cave_extra', meritDelta: 1, riskShiftDelta: 4 }] }),
 
-    ch5_cave_bells_bad: death('你開始知道怎麼讓別人死', '第二個鈴沒有掛上', [
+    ch5_cave_bells_bad: S('你開始知道怎麼讓別人死', '第二個鈴沒有掛上', [
       '何春禾在左岔停得太久。等你們聽見第一聲鈴撞時，她已經被灰膜拖進牆裡。',
       '你們因此知道左壁不是一直危險，而是會在某些時段活過來。',
-      '她的死立刻變成一條非常有用的時間情報。這正是最噁心的地方。'
-    ], '試役弟子在北三洞掛探煞鈴時遭活性陰煞壁吞噬。', '她替所有後來的人，\n把一個時辰寫成了紅字。', '別人的死能提供高價值情報，但不能因此推導成「值得」。真正要學的是活動時段、徵兆與撤退條件，而不是固定派人去死。'),
+      '她的死立刻變成一條非常有用的時間情報。這正是最噁心的地方。',
+      '你站在洞外，活著的人還在等你分配剩餘差事。你必須處理何春禾的債、名冊和留下的情報。'
+    ], { choices: [
+      { text:'記錄活動時段與可見徵兆，不把死者當成實驗工具', next:'ch5_cave_names', intelDelta:8, responsibilityDelta:5, karmaDelta:5 },
+      { text:'用她的死亡情報優先完成採集報告', next:'ch5_cave_names', intelDelta:10, riskShiftDelta:5, meritDelta:2 }
+    ] }),
 
     ch5_cave_self_hurt: S('你開始知道怎麼讓別人死', '你沒有死，但一個月不能帶隊', [
       '你親自掛鈴時被陰煞擦過胸口。沒有當場死，卻要休養一個月。',
